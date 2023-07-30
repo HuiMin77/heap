@@ -1,0 +1,113 @@
+{% extends 'events/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h4>Events for Exco</h4>
+        <a href="">
+            <button type="button" class="btn btn-secondary float-end mb-5 mr-5">Add Event</button>
+          </a> 
+        <div class="col-md-12">    
+            <div id='calendar'></div> 
+        </div> 
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var calendar = $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            events: '/all_events',
+            selectable: true,
+            selectHelper: true,
+            editable: true,
+            eventLimit: true,
+            timezone: 'Asia/Singapore',
+            dayClick: function (date, jsEvent, view) {
+                var formattedDate = moment(date).format("MMMM YYYY");
+                $('#currentMonthYear').text(formattedDate);
+            },
+            select: function (start_event_date, end, allDay) {
+                var name = prompt("Enter Event name");
+                if (name) {
+                    var start_event_date = moment(start_event_date).format("Y-MM-DD HH:mm:ss");
+                    var end_event_date = moment(end).format("Y-MM-DD HH:mm:ss");
+                    $.ajax({
+                        type: "GET",
+                        url: '/add_event',
+                        data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date },
+                        dataType: "json",
+                        success: function (data) {
+                            calendar.fullCalendar('refetchEvents');
+                            alert("Added Successfully");
+                        },
+                        error: function (data) {
+                            alert('There is a problem!!!');
+                        }
+                    });
+                }
+            },
+            eventResize: function (event) {
+                var start_event_date = moment(event.start).format("Y-MM-DD HH:mm:ss");
+                var end_event_date = moment(event.end).format("Y-MM-DD HH:mm:ss");
+                var name = event.title;
+                var id = event.id;
+                $.ajax({
+                    type: "GET",
+                    url: '/update',
+                    data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date, 'id': id },
+                    dataType: "json",
+                    success: function (data) {
+                        calendar.fullCalendar('refetchEvents');
+                        alert('Event Update');
+                    },
+                    error: function (data) {
+                        alert('There is a problem!!!');
+                    }
+                });
+            },
+
+            eventDrop: function (event) {
+                var start_event_date = moment(event.start).format("Y-MM-DD HH:mm:ss");
+                var end_event_date = moment(event.end).format("Y-MM-DD HH:mm:ss");
+                var name = event.title;
+                var id = event.id;
+                $.ajax({
+                    type: "GET",
+                    url: '/update',
+                    data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date, 'id': id },
+                    dataType: "json",
+                    success: function (data) {
+                        calendar.fullCalendar('refetchEvents');
+                        alert('Event Update');
+                    },
+                    error: function (data) {
+                        alert('There is a problem!!!');
+                    }
+                });
+            },
+
+            eventClick: function (event) {
+                if (confirm("Are you sure you want to remove it?")) {
+                    var id = event.id;
+                    $.ajax({
+                        type: "GET",
+                        url: '/remove',
+                        data: { 'id': id },
+                        dataType: "json",
+                        success: function (data) {
+                            calendar.fullCalendar('refetchEvents');
+                            alert('Event Removed');
+                        },
+                        error: function (data) {
+                            alert('There is a problem!!!');
+                        }
+                    });
+                }
+            },
+        });
+    });
+</script>
+{% endblock %}

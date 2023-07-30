@@ -1,0 +1,85 @@
+{% extends 'events/base.html' %}
+{% block content %}
+<style>
+    /* Custom CSS to make the cards bigger */
+    .card {
+      width: 100rem;
+      margin-left: 15%;
+      margin-top: 10% /* You can adjust this value to make the cards wider */
+    }
+  
+    .card-img-top {
+      height: 12rem; /* You can adjust this value to make the card image taller */
+      object-fit: cover; /* This ensures the image scales appropriately */
+    }
+    #carouselExampleControls {
+    padding: 0; /* Remove padding around the carousel */
+  }
+
+  .carousel-inner {
+    margin: 0; /* Remove margin from the carousel inner container */
+  }
+
+  .carousel-item img {
+    width: 100%; /* Ensure the carousel images cover the full width */
+    height: 400px; /* You can adjust this value to change the carousel image height */
+    object-fit: cover; /* This ensures the carousel images scale appropriately */
+  }
+  </style>
+  <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img style="width: 1000px; height: 400px;" src="https://i.pinimg.com/736x/26/87/df/2687df3e5a5b1b8a5f95be66e4b87571.jpg" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
+        <img style="width: 1000px; height: 400px;" src="https://i.pinimg.com/736x/7c/9b/4d/7c9b4dee910b156daa2271c79a0d4d97.jpg" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
+        <img style="width: 1000px; height: 400px;"src="https://i.pinimg.com/736x/50/7d/88/507d8802a9c758369b52fd70d37b8eaf.jpg" class="d-block w-100" alt="...">
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="https://d2ydtwisqcxv72.cloudfront.net/211020-Google-Calendar-Planning-Blog.jpg" alt="Card image cap">
+                <div class="card-body">
+                  <h5 class="card-title">Plan Events</h5>
+                  <p class="card-text">You can use this to plan your cca events</p>
+                  <a href="#" class="btn btn-primary">Let's Go</a>
+                </div>
+              </div>
+        </div>
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="https://d2ydtwisqcxv72.cloudfront.net/211020-Google-Calendar-Planning-Blog.jpg" alt="Card image cap">
+                <div class="card-body">
+                  <h5 class="card-title">Plan Events</h5>
+                  <p class="card-text">You can use this to plan your cca events</p>
+                  <a href="#" class="btn btn-primary">Let's Go</a>
+                </div>
+              </div>
+        </div>
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="https://d2ydtwisqcxv72.cloudfront.net/211020-Google-Calendar-Planning-Blog.jpg" alt="Card image cap">
+                <div class="card-body">
+                  <h5 class="card-title">Plan Events</h5>
+                  <p class="card-text">You can use this to plan your cca events</p>
+                  <a href="#" class="btn btn-primary">Let's Go</a>
+                </div>
+              </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
