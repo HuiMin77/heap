@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Venue, Event
+from .models import Venue, Event, Student
 
 #Create a venue form
 class VenueForm(ModelForm):
@@ -19,7 +19,7 @@ class VenueForm(ModelForm):
             'image_url':forms.TextInput(attrs={'class':'form-control','placeholder':'Image URL'}),
             'address':forms.TextInput(attrs={'class':'form-control','placeholder':'Address'}),
             'zip_code':forms.TextInput(attrs={'class':'form-control','placeholder':'Zip Code'}),
-            'web':forms.TextInput(attrs={'class':'form-control','placeholder':'Webiste'})
+            'web':forms.TextInput(attrs={'class':'form-control','placeholder':'Website'})
         }
 
 
@@ -51,3 +51,26 @@ class EventForm(ModelForm):
             'description':forms.TextInput(attrs={'class':'form-control','placeholder':'Description'}),    
             
         }
+
+#Create a student form
+class StudentForm(ModelForm):
+    class Meta:
+        model = Student
+        fields = ('first_name','last_name','student_id','email','mobile_number','chat_id')
+        labels = {
+            'first_name': '',
+            'last_name':'',
+            'student_id':'',
+            'email':'',
+            'mobile_number':'',
+            'chat_id':''
+        }
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class':'form-control','placeholder':'First Name'}),
+            'last_name':forms.TextInput(attrs={'class':'form-control','placeholder':'Last Name'}),
+            'student_id':forms.TextInput(attrs={'class':'form-control','placeholder':'Student ID'}),
+            'email':forms.TextInput(attrs={'class':'form-control','placeholder':'Email'}),
+            'mobile_number':forms.TextInput(attrs={'class':'form-control','placeholder':'Mobile Number'}),
+            'chat_id':forms.TextInput(attrs={'class':'form-control','placeholder':'Chat ID'})
+        }
+

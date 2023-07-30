@@ -28,6 +28,7 @@
             <span class="fs-5 d-none d-sm-inline">Exco Verse</span>
           </a>
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+            {% if user.is_authenticated %}
             <li class="nav-item">
               <a href="{% url 'list-venues' %}" class="nav-link align-middle px-0">
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Venues</span>
@@ -39,7 +40,6 @@
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Events</span>
               </a>
             </li>
-            {% if user.is_authenticated %}
             <li class="nav-item">
               <a href="{% url 'logout' %}" class="nav-link align-middle px-0">
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Logout</span>

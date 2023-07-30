@@ -7,8 +7,8 @@ from datetime import datetime
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import JsonResponse 
-from events.models import Event
-from .forms import VenueForm, EventForm
+from events.models import Event, Membership
+from .forms import VenueForm, EventForm, StudentForm
 
 def home(request):
     # img = ['']
@@ -98,3 +98,18 @@ def add_venue(request):
 #         if 'submitted' in request.GET:
 #             submitted = True
 #     return render(request,'events/add_event.html',{'form':form, 'submitted': submitted})
+
+def add_student(request):
+    submitted = False
+    if request.method == "POST":
+        form = StudentForm(request.POST)
+        # Valid stuff?
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/add_student?submitted=True')
+    else: 
+        form = StudentForm
+        if 'submitted' in request.GET:
+            submitted = True
+    return render(request,'events/add_student.html',{'form':form, 'submitted': submitted})
+
