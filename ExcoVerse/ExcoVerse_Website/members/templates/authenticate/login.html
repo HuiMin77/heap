@@ -7,8 +7,13 @@
             {% csrf_token %}
             
                 <div class="form-group">
-                  <label for="username">Username</label>
-                  <input type="text" class="form-control" name="username" aria-describedby="usernameHelp" placeholder="Username">
+                  <label for="username">CCA</label>
+                  <select class="form-control" name="username" aria-describedby="usernameHelp" placeholder="Username">
+                    <option selected>choose your cca in this select menu</option>
+                    {% for cca in cca_list %}
+                    <option value={{cca}}>{{cca}}</option>
+                    {% endfor %}
+                  </select>
                 </div>
                 <br>
                 <div class="form-group">

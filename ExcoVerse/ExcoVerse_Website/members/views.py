@@ -8,9 +8,11 @@ from django.shortcuts import render
 from django.conf import settings
 from pathlib import Path
 import time
+from events.models import CCA
 
 def login_user(request):
     # Check if the person go to the webpage or fill out the form
+    cca_list = CCA.objects.all()
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
@@ -25,7 +27,7 @@ def login_user(request):
             # Return an 'invalid login' error message.
             return redirect('login')
     else:
-        return render(request,'authenticate/login.html',{})
+        return render(request,'authenticate/login.html',{'cca_list':cca_list})
 
 
 def logout_user(request):
