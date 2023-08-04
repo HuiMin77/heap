@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Venue, Event, Student
+from .models import Venue, Event, Student, PaymentPoll
 
 #Create a venue form
 class VenueForm(ModelForm):
@@ -73,4 +73,28 @@ class StudentForm(ModelForm):
             'mobile_number':forms.TextInput(attrs={'class':'form-control','placeholder':'Mobile Number'}),
             'chat_id':forms.TextInput(attrs={'class':'form-control','placeholder':'Chat ID'})
         }
+
+#Create a student form
+
+class PaymentForm(ModelForm):
+    class Meta:
+        model = PaymentPoll
+        fields = ('subject','description','price','payment_event')
+        # Customise label names
+        labels = {
+            'subject': '',
+            'description':'',
+            'price':'',
+            'payment_event':''
+            
+        }
+        widgets = {
+            'subject': forms.TextInput(attrs={'class':'form-control','placeholder':'Subject'}),
+            'description':forms.TextInput(attrs={'class':'form-control','placeholder':'Description'}),
+            'price':forms.TextInput(attrs={'class':'form-control','placeholder':'Price'}),
+            
+
+        }
+    payment_event = forms.ModelChoiceField(queryset=Event.objects.all(), label='Select Event')
+
 

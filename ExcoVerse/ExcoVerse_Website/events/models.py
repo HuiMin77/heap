@@ -1,4 +1,8 @@
 from django.db import models
+from members.models import UserProfile
+import random
+import string
+import hashlib
 
 # Create your models here.
 class CCA(models.Model):
@@ -63,3 +67,52 @@ class Attendance(models.Model):
 
     def __str__(self):
         return self.student
+    
+class PaymentPoll(models.Model):
+    subject = models.CharField('Subject', max_length=120)
+    description = models.TextField('Description')
+    price = models.DecimalField('Price', max_digits=8, decimal_places=2)
+
+    password = models.CharField(max_length=6)
+    hashed_password = models.CharField(max_length=120)
+    payment_event =  models.ForeignKey(Event, blank=True, null=True, on_delete=models.CASCADE)
+    stripe_account_id =  models.ForeignKey(UserProfile, blank=True, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.subject
+    def generate_poll_password(self):
+    # Generate a random 6-character code consisting of numbers and uppercase letters
+        characters = string.digits + string.ascii_uppercase
+        code = ''.join(random.choices(characters, k=6))
+        print("password is"+code)
+        return code
+
+    def generate_hashed_poll_password(self,plain_password):
+    # Hash the password using SHA-256
+        hashed_password = hashlib.sha256(plain_password.encode()).hexdigest()
+        print("hashed is "+ hashed_password)
+        return hashed_password
+    
+    def save(self, *args, **kwargs):
+        # Generate the random code and hash the password
+        if not self.pk:  # Only generate the code if it's a new Payment poll
+            six_digit_code = self.generate_poll_password()
+            self.password = six_digit_code
+            hashed_password = self.generate_hashed_poll_password(six_digit_code)
+            self.hashed_password = hashed_password
+            print("success")
+        super().save(*args, **kwargs) 
+
+class PaymentDetails(models.Model):
+    user_id = models.IntegerField()
+    chat_id = models.IntegerField()
+    payment_id = models.CharField(max_length=255)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=3)
+    payment_provider = models.CharField(max_length=255)
+    is_success = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+   
+
+    

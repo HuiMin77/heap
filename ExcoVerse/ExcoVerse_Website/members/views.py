@@ -9,6 +9,24 @@ from django.conf import settings
 from pathlib import Path
 import time
 from events.models import CCA
+from .models import UserProfile
+import stripe
+import os
+
+from dotenv import load_dotenv
+# from events.models import PaymentPoll
+import hashlib
+# from importlib import import_module
+
+
+# Import the PaymentPoll model after initializing the Django application
+
+# Load environment variables from .env file
+
+# dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'events', '.env')
+# load_dotenv(dotenv_path)
+# stripe.api_key = os.environ.get('STRIPE_API_KEY')
+stripe.api_key = 'sk_test_51NPQo0HLT8WmDutBFqvUGugxoLESvZLHVse03ccDBJhV4sCCor47wDlK128kVi0OTsK9rhYrPhH7rF7wnFNLJliS00di72Mrdz'
 
 def login_user(request):
     # Check if the person go to the webpage or fill out the form
@@ -44,13 +62,50 @@ def register_user(request):
             username = form.cleaned_data['username']
             print(username)
             password = form.cleaned_data['password1']
+            email = form.cleaned_data['email']
             user = authenticate(username = username,password=password)
             login(request,user)
+            stripe_account_tuple = create_connected_account()
+            account_id = stripe_account_tuple[0]
+            account_link = stripe_account_tuple[1]
+            
+            redirect_stripe_url = account_link.url
+            print(account_link)
+            stripe_account_id = account_id
+            update_stripe_account_id(request.user,stripe_account_id)
+
+            
+            print(redirect_stripe_url)
             messages.success(request,("Registration Successful"))
-            return redirect('home')
+            
+
+            return redirect(redirect_stripe_url)
     else:
         form = RegisterUserForm()
+        print(stripe.api_key)
     return render(request,'authenticate/register_user.html',{'form':form,})
+
+def create_connected_account():
+    account = stripe.Account.create(
+        type="standard",  # Use "standard" or another account type as needed
+        country="SG",  # Replace with the country code of the connected account
+       
+        
+    )
+    account_id = account.stripe_id
+
+    account_link = stripe.AccountLink.create(
+        account=account_id,
+        refresh_url="http://127.0.0.1:8000/authenticate/register_user.html",
+        return_url="http://127.0.0.1:8000/",
+        type="account_onboarding",
+    )
+    return (account_id,account_link)
+
+def update_stripe_account_id(user, stripe_account_id):
+    user_profile, created = UserProfile.objects.get_or_create(user=user)
+    user_profile.stripe_account_id = stripe_account_id
+    user_profile.save()
 
 # def qr_gen(request):
 #     if request.method == 'POST':
