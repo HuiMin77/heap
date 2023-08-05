@@ -1,14 +1,12 @@
 from django.shortcuts import render
 from .models import Venue
-from django.shortcuts import render
 import calendar 
 from calendar import HTMLCalendar
 from datetime import datetime
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.http import JsonResponse 
-from events.models import Event, Membership
-from .forms import VenueForm, EventForm, StudentForm
+from events.models import Event, Membership, PaymentPoll, Tracking_Payment, Student
+from .forms import VenueForm, EventForm, StudentForm, PaymentForm, EventSelectionForm
 
 def home(request):
     # img = ['']
@@ -113,3 +111,65 @@ def add_student(request):
             submitted = True
     return render(request,'events/add_student.html',{'form':form, 'submitted': submitted})
 
+def add_payment(request):
+    submitted = False
+    password = ''
+    # if they fill out the form and submit
+    
+    if request.method == "POST":
+        form = PaymentForm(request.POST)
+        if form.is_valid():
+            # payment_poll = form.save()  # Save the form data and get the PaymentPoll instance
+            # print(payment_poll) 
+            # # Get the form data
+            subject = form.cleaned_data['subject']
+            description = form.cleaned_data['description']
+            price = form.cleaned_data['price']
+            payment_event = form.cleaned_data['payment_event']
+            # payment_poll = PaymentPoll.objects.get(subject=subject)
+            # password = form.cleaned_data['password']
+            payment_poll = form.save()  # Save the form data without committing to the database
+            password = payment_poll.password  # Generate the password
+            # Hash the password
+            # Save the instance with the generated and hashed password
+            submitted = True
+            print(subject,description,price,password,payment_event)
+            
+            students = Student.objects.all()
+            for student in students:
+                Tracking_Payment.objects.create(student=student, event=payment_event, paid=False)
+            # return HttpResponseRedirect('/add_payment?submitted=True')
+            return render(request, 'events/add_payment.html', {'form': form, 'submitted': submitted, 'password': password})
+    else:
+        form = PaymentForm
+        if 'submitted' in request.GET:
+            submitted = True
+    
+    return render(request,'events/add_payment.html',{'form':form,'submitted':submitted,'password':password})
+
+def track_payments(request):
+    tracking_payment_list = Tracking_Payment.objects.all()
+    return render(request,'events/Track_Payments.html',{'tracking_payment_list':tracking_payment_list})
+
+def track_event_payment_polls(request):
+    selected_event = None
+    tracking_payments = None
+
+    if request.method == 'POST':
+        form = EventSelectionForm(request.POST)
+        if form.is_valid():
+            selected_event = form.cleaned_data['event']
+            if selected_event:
+                tracking_payments = Tracking_Payment.objects.filter(event=selected_event)
+            else:
+                tracking_payments = Tracking_Payment.objects.all()
+    else:
+        form = EventSelectionForm()
+
+    context = {
+        'form': form,
+        'tracking_payments': tracking_payments,
+        'selected_event': selected_event,
+    }
+
+    return render(request, 'events/Track_Payments.html', context)

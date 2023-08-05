@@ -11,5 +11,7 @@ urlpatterns = [
     path('remove/', views.remove, name='remove'),
     path('add_venue',views.add_venue,name='add-venue'),
     path('add_student',views.add_student,name='add-student'),
+    path('add_payment',views.add_payment,name='payment'),
+    path('track_payments',views.track_event_payment_polls,name='track_payments'),
     # path('add_event',views.add_event,name='add-event')
 ]
