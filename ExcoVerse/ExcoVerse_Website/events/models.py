@@ -21,7 +21,7 @@ class Student(models.Model):
 class Membership(models.Model):
     cca = models.ForeignKey(CCA, blank=True, null=True, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, blank=True, null=True, on_delete=models.CASCADE)
-    exco = models.BooleanField(default=False)
+    # exco = models.BooleanField(default=False)
     
     def __str__(self):
         return str(self.student)
@@ -63,3 +63,4 @@ class Attendance(models.Model):
 
     def __str__(self):
         return self.student
+

@@ -7,7 +7,7 @@ from datetime import datetime
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import JsonResponse 
-from events.models import Event, Membership
+from events.models import Event, Membership, CCA, Student
 from .forms import VenueForm, EventForm, StudentForm
 
 def home(request):
@@ -103,13 +103,49 @@ def add_student(request):
     submitted = False
     if request.method == "POST":
         form = StudentForm(request.POST)
-        # Valid stuff?
         if form.is_valid():
             form.save()
+            first_name = form.cleaned_data.get('first_name')
+            last_name = form.cleaned_data.get('last_name')
+            add_membership(request, first_name, last_name)  # Pass the 'request' argument
             return HttpResponseRedirect('/add_student?submitted=True')
-    else: 
-        form = StudentForm
+    else:
+        form = StudentForm()  # Instantiate the form
         if 'submitted' in request.GET:
             submitted = True
-    return render(request,'events/add_student.html',{'form':form, 'submitted': submitted})
+    return render(request, 'events/add_student.html', {'form': form, 'submitted': submitted})
+
+def add_membership(request, first_name, last_name):
+    if request.user.is_authenticated:
+        username = request.user.username
+        cca_instance, cca_created = CCA.objects.get_or_create(name=username)
+        
+        student_instance, student_created = Student.objects.get_or_create(
+            first_name=first_name,
+            last_name=last_name
+        )
+        
+        membership = Membership.objects.create(student=student_instance, cca=cca_instance)
+
+def scan_QRCode():
+    cam = cv2.VideoCapture(0)
+
+    cam.set(5, 640)
+    cam.set(6, 480)
+
+    camera = True
+    while camera == True:
+        success, frame = cam.read()
+
+        for i in decode(frame):
+            # print(i.type)
+            print(i.data.decode('utf-8'))
+            time.sleep(3)
+
+            cv2.imshow("OurQr_Code_Scanner", frame)
+            cv2.waitKey(3)
+
+
+
+
 
