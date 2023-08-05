@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 class CCA(models.Model):
     name = models.CharField('CCA Name', max_length=120)
-    
+    email = models.CharField('Email', max_length=120,null=True)
     def __str__(self):
         return self.name
 
