@@ -1,0 +1,47 @@
+<!-- events/track_event_payment_polls.html -->
+
+{% extends 'events/base.html' %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'events/css/style.css' %}">
+
+{% block content %}
+
+<h1>Track Event Payment Polls</h1>
+<br>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Filter">
+</form>
+
+{% if tracking_payments %}
+<div class="card">
+    <div class="card-header">
+        {% if selected_event %}
+        Payment Information for {{ selected_event.name }}
+        {% else %}
+        All Events
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% for payment in tracking_payments %}
+        <h5 class="card-title">Student: {{ payment.student.first_name }} {{ payment.student.last_name }}</h5>
+        <p class="card-text">
+            <ul>
+                <li>Payment Status: {% if payment.paid %}Paid{% else %}Not Paid{% endif %}</li>
+                <li>Student ID: {{ payment.student.student_id }}</li>
+                <li>Student Chat ID: {{ payment.student.chat_id }}</li>
+            </ul>
+        </p>
+        {% endfor %}
+    </div>
+    <div class="card-footer text-muted">
+    </div>
+</div>
+{% else %}
+<p>No tracking payments found for this event.</p>
+{% endif %}
+
+{% endblock %}
