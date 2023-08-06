@@ -18,7 +18,7 @@ class Student(models.Model):
     student_id = models.CharField(max_length=30)
     email = models.EmailField('User Email')
     mobile_number = models.CharField(max_length=30)
-    chat_id = models.CharField(max_length=30, null = True)
+    chat_id= models.CharField(max_length=30, null = True)
     
     def __str__(self):
         return self.first_name + ' ' + self.last_name
@@ -70,8 +70,6 @@ class Attendance(models.Model):
         return self.student
     
 class PaymentPoll(models.Model):
-    # id = models.AutoField(primary_key=True)
-    # poll_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     subject = models.CharField('Subject', max_length=120)
     description = models.TextField('Description')
     price = models.DecimalField('Price', max_digits=8, decimal_places=2)
@@ -109,19 +107,24 @@ class PaymentPoll(models.Model):
 
 class PaymentDetails(models.Model):
     poll_id = models.ForeignKey(PaymentPoll,blank=True, null=True,on_delete=models.CASCADE)  # Reference the poll_id field in PaymentPoll
-
+    payee = models.ForeignKey(Student,blank=True, null=True,on_delete=models.CASCADE)
     user_id = models.IntegerField()
     chat_id = models.IntegerField()
     payment_id = models.CharField(max_length=255)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3)
     payment_provider = models.CharField(max_length=255)
-    is_success_excoverse = models.BooleanField(default=False)
-    is_success_club = models.BooleanField(default=False)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     # poll_creator =  models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     # stripe_account_id = models.CharField(max_length=255)
 
    
+class Tracking_Payment(models.Model):
+    student = models.ForeignKey(Student, blank=True, null=True, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, default = '')
+    price = models.ForeignKey(PaymentPoll, blank=True, null=True, on_delete=models.CASCADE)
+    is_success_excoverse = models.BooleanField(default=False)
+    is_success_club = models.BooleanField(default=False)
 
     

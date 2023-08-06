@@ -13,5 +13,6 @@ urlpatterns = [
     path('add_student',views.add_student,name='add-student'),
     path('add_payment',views.add_payment,name='payment'),
     path('transfer_payment',views.transfer_payment,name='transfer-payment'),
+    path('track_payments',views.track_event_payment_polls,name='track_payments'),
     # path('add_event',views.add_event,name='add-event')
 ]

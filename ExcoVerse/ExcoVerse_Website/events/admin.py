@@ -11,7 +11,7 @@ from .models import Venue
 from .models import Event
 from .models import Attendance
 from .models import PaymentPoll
-from .models import PaymentDetails
+from .models import PaymentDetails, Tracking_Payment
 from django.contrib.auth.models import Group
 
 admin.site.register(CCA)
@@ -23,6 +23,7 @@ admin.site.register(Event)
 admin.site.register(Attendance)
 admin.site.register(PaymentPoll)
 admin.site.register(PaymentDetails)
+admin.site.register(Tracking_Payment)
 admin.site.unregister(Group)
 
 

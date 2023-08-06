@@ -1,0 +1,116 @@
+<!-- events/track_event_payment_polls.html -->
+
+{% extends 'events/base.html' %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'events/css/style.css' %}">
+
+{% block content %}
+
+<h1>Track Event Payment Polls</h1>
+<br>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Filter">
+</form>
+
+{% if tracking_payments %}
+
+    {% if selected_event %}
+        {% regroup tracking_payments by event as event_payments %}
+
+        {% for event_group in event_payments %}
+        <h2>Event: {{ event_group.grouper }}</h2>
+        <h3>No. of People Paid: {{total_paid}} </h3>
+        <h3>Total No. of People Not Paid: {{total_never_pay}}</h3>
+        <h3>Amount of Money Collectable {{unprocessed_payment_count}} </h3>
+        <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Student ID</th>
+                    <th>Student Chat ID</th>
+                    <th>Payment Completed</th>
+                    <th>Payment Received</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in event_group.list %}
+                <tr class="{% if not payment.paid %}not-paid{% endif %}">
+                    <td>{{ payment.student.first_name }} {{ payment.student.last_name }}</td>
+                    <td>{{ payment.student.student_id }}</td>
+                    <td>{{ payment.student.chat_id }}</td>
+                    <td>{% if payment.is_success_excoverse %}Paid{% else %}Not Paid{% endif %}</td>
+                    <td>{% if payment.is_success_club %}Received{% else %}Not Received{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% endfor %}
+    
+    {% else %}
+        
+        <div class="card-footer text-muted">  
+            <!-- <script src="https://js.stripe.com/v3/"></script>
+            <button id="transferButton">Transfer Funds</button> -->
+            <form action="{% url 'transfer-payment' %}" method="POST">
+              {% csrf_token %}
+              
+              <button type="submit" class="btn btn-secondary">Process Payment</button>
+            </form>
+            
+        </div>
+        <h2>All Events</h2>
+        <h3>No. of People Paid: {{total_paid}} </h3>
+        <h3>Total No. of People Not Paid: {{total_never_pay}}</h3>
+        <h3>Amount of Money Collectable {{unprocessed_payment_count}} </h3>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Student ID</th>
+                        <th>Student Chat ID</th>
+                        <th>Payment Completed</th>
+                        <th>Payment Received</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in tracking_payments %}
+                    <tr class="{% if not payment.paid %}not-paid{% endif %}">
+                        <td>{{ payment.student.first_name }} {{ payment.student.last_name }}</td>
+                        <td>{{ payment.student.student_id }}</td>
+                        <td>{{ payment.student.chat_id }}</td>
+                        <td>{% if payment.is_success_excoverse %}Paid{% else %}Not Paid{% endif %}</td>
+                        <td>{% if payment.is_success_club %}Received{% else %}Not Received{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% else %}
+    <p>No tracking payments found for any event.</p>
+{% endif %}
+
+
+{% endblock %}
+<!-- <script>
+    var paymentData = {
+        unprocessed_payment_count: "{{ unprocessed_payment_count|default:'0' }}",
+        tracking_payments: JSON.parse('{{ tracking_payments_json|safe }}')
+    };
+    var paymentDataJson = JSON.stringify(paymentData);
+    document.getElementById('payment_data').value = paymentDataJson;
+</script> -->
+<style>
+    /* Custom CSS for sorting the table */
+    .not-paid {
+        background-color: #FFC0CB; /* Pink color for rows where payment status is not paid */
+    }
+</style>

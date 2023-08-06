@@ -98,3 +98,5 @@ class PaymentForm(ModelForm):
     payment_event = forms.ModelChoiceField(queryset=Event.objects.all(), label='Select Event')
 
 
+class EventSelectionForm(forms.Form):
+    event = forms.ModelChoiceField(queryset=Event.objects.all(), empty_label="All Events", required=False)
