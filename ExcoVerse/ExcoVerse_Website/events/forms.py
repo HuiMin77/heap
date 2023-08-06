@@ -26,29 +26,25 @@ class VenueForm(ModelForm):
 class EventForm(ModelForm):
     class Meta:
         model = Event
-        fields = ('name','start_event_date','end_event_date','venue','image_url','internal','manager','description')
+        fields = ('name','start_event_date','end_event_date','venue', 'attendees', 'internal','description')
         labels = {
-            'name': '',
-            'start_event_date':'',
-            'end_event_date':'',
-            'venue':'',
-            'image_url':'',
+            'name': 'Event Name',
+            'start_event_date':'Start Event Date',
+            'end_event_date':'End Event Date',
+            'venue':'Venue',
             'internal':'Internal Event?',
-            'manager':'',
-            'description':'',
-            
-
+            'attendees': 'Attendees',
+            'description':'Description',
 
         }
         widgets = {
             'name':forms.TextInput(attrs={'class':'form-control','placeholder':'Event Name'}),
             'start_event_date':forms.TextInput(attrs={'class':'form-control','placeholder':'Start Event Date'}),
             'end_event_date':forms.TextInput(attrs={'class':'form-control','placeholder':'End Event Date'}),
-            'venue':forms.TextInput(attrs={'class':'form-control','placeholder':'Venue'}),
-            'image_url':forms.TextInput(attrs={'class':'form-control','placeholder':'Image URL'}),
+            'venue':forms.Select(attrs={'class':'form-select','placeholder':'Venue'}),
+            'attendees':forms.SelectMultiple(attrs={'class':'form-select','placeholder':'Attendees'}),
             'internal': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'manager':forms.TextInput(attrs={'class':'form-control','placeholder':'manager'}),
-            'description':forms.TextInput(attrs={'class':'form-control','placeholder':'Description'}),    
+            'description':forms.Textarea(attrs={'class':'form-control','placeholder':'Description'}),    
             
         }
 

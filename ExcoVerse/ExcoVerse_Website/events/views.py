@@ -40,25 +40,57 @@ def events(request):
     return render(request,'events/events.html',context)
  
 def all_events(request):
-    all_events = Event.objects.all()
-    events_data = []
-    for event in all_events:
-        events_data.append({
-            'title': event.name,
-            'start': event.start_event_date.strftime("%Y-%m-%d %H:%M:%S"),
-            'end': event.end_event_date.strftime("%Y-%m-%d %H:%M:%S"),
-            'id': event.id,
-        })
-    return JsonResponse(events_data, safe=False)
- 
+    event_list = Event.objects.all()
+    # events_data = []
+    # for event in all_events:
+    #     events_data.append({
+    #         'title': event.name,
+    #         'start': event.start_event_date.strftime("%Y-%m-%d %H:%M:%S"),
+    #         'end': event.end_event_date.strftime("%Y-%m-%d %H:%M:%S"),
+    #         'id': event.id,
+    #     })
+    # return JsonResponse(events_data, safe=False)
+    return render(request,'events/events-list.html',{'event_list':event_list})
 def add_event(request):
-    start_event_date = request.GET.get("start_event_date", None)
-    end_event_date = request.GET.get("end_event_date", None)
-    name = request.GET.get("name", None)
-    event = Event(name=str(name), start_event_date=start_event_date, end_event_date=end_event_date)
-    event.save()
-    data = {}
-    return JsonResponse(data)
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Handle successful form submission
+            # (e.g., redirect to a success page or show a success message)
+    else:
+        form = EventForm()
+    return render(request, 'events/add_event.html', {'form': form})
+
+def add_event(request):
+    submitted = False
+    if request.method == "POST":
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save()  # Save the event
+            attendees = form.cleaned_data.get('attendees')
+
+            for email in attendees:
+                print(email)
+                # Split the student name into first name and last name
+                student_instance, student_created = Student.objects.get_or_create(email=email)
+
+                add_attendance(request, student=student_instance, event=event)
+
+            return HttpResponseRedirect('/add_event?submitted=True')
+    else:  
+        form = EventForm
+        if 'submitted' in request.GET:
+            submitted = True
+    return render(request, 'events/add_event.html', {'form': form, 'submitted': submitted})
+
+def add_attendance(request, student, event):
+    print(student)
+    if request.user.is_authenticated:
+        print('yolo',student)
+        # Get or create the event instance
+        # Create the attendance record
+        Attendance.objects.create(student=student, event=event, present=False)
  
 def update(request):
     start_event_date = request.GET.get("start_event_date", None)
@@ -114,9 +146,8 @@ def add_student(request):
         form = StudentForm(request.POST)
         if form.is_valid():
             form.save()
-            first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
-            add_membership(request, first_name, last_name)  # Pass the 'request' argument
+            student_id  = form.cleaned_data.get('student_id')
+            add_membership(request, student_id)  # Pass the 'request' argument
             return HttpResponseRedirect('/add_student?submitted=True')
     else:
         form = StudentForm()  # Instantiate the form
@@ -124,17 +155,16 @@ def add_student(request):
             submitted = True
     return render(request, 'events/add_student.html', {'form': form, 'submitted': submitted})
 
-def add_membership(request, first_name, last_name):
+def add_membership(request, student_id):
     if request.user.is_authenticated:
         username = request.user.username
-        cca_instance, cca_created = CCA.objects.get_or_create(name=username)
-        
+        cca_instance, cca_created= CCA.objects.get_or_create(name=username)
         student_instance, student_created = Student.objects.get_or_create(
-            first_name=first_name,
-            last_name=last_name
+            student_id = student_id
         )
         
-        membership = Membership.objects.create(student=student_instance, cca=cca_instance)
+        Membership.objects.create(student=student_instance, cca=cca_instance)
+
 
 def generate_frames(status):
    

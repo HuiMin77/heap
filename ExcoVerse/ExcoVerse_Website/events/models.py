@@ -11,12 +11,12 @@ class Student(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     student_id = models.CharField(max_length=30)
-    email = models.EmailField('User Email')
+    email = models.EmailField('User Email', unique=True)
     mobile_number = models.CharField(max_length=30)
     chat_id = models.CharField(max_length=30, null = True)
     
     def __str__(self):
-        return self.first_name + ' ' + self.last_name
+        return self.first_name + ' ' + self.last_name + ' ' + self.student_id
 
 class Membership(models.Model):
     cca = models.ForeignKey(CCA, blank=True, null=True, on_delete=models.CASCADE)
@@ -24,7 +24,7 @@ class Membership(models.Model):
     # exco = models.BooleanField(default=False)
     
     def __str__(self):
-        return str(self.student)
+        return self.student.email + ' ' + self.cca.name
 
 class Payment(models.Model):
     membership = models.ForeignKey(Membership, blank=True, null=True, on_delete=models.CASCADE)
@@ -48,9 +48,8 @@ class Event(models.Model):
     start_event_date = models.DateTimeField('Event Start Date')
     end_event_date = models.DateTimeField('Event End Date')
     venue = models.ForeignKey(Venue, blank=True, null=True, on_delete=models.CASCADE)
-    image_url = models.CharField('Event Image URL', max_length=200)
+    attendees = models.ManyToManyField(Student, blank=True, null=True)
     internal = models.BooleanField(default=False)
-    manager = models.ForeignKey(Student, blank=True, null=True, on_delete=models.SET_NULL)
     description = models.TextField(blank=True)
     
     def __str__(self):
@@ -62,6 +61,5 @@ class Attendance(models.Model):
     present = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.student.first_name + ' '+ self.student.last_name
-
+        return self.student.first_name + ' ' + self.student.last_name 
 
