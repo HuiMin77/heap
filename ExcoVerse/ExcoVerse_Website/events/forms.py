@@ -74,3 +74,4 @@ class StudentForm(ModelForm):
             'chat_id':forms.TextInput(attrs={'class':'form-control','placeholder':'Chat ID'})
         }
 
+

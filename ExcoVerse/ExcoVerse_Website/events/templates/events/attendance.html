@@ -1,0 +1,83 @@
+{% extends 'events/base.html' %}
+{% block content %}
+<center>
+    <h1>Attendance</h1>
+</center>
+<p>Filter By Event:</p>
+<form class="d-flex" method="POST" action="{% url 'attendance' %}">
+    {% csrf_token %}
+          <input class="form-control me-2" type="search" placeholder="Search Venues" aria-label="Search" name="searched">
+          <button class="btn btn-secondary" type="submit">Search</button>
+</form>
+<br>
+ <!-- <a id="toggleLink" href='' class="btn btn-primary">Let's Go</a> -->
+ <h4>To Take Attendance Please Press Start:</h4>
+ <button class="btn btn-primary" id="startButton">Start</button>
+ <button class="btn btn-primary" id="stopButton">Stop</button>
+ <h2 id="refresh-timer"></h2>
+<table class="table table-dark">
+    <thead>
+        <tr>
+            <th scope="col">Event</th>
+            <th scope="col">Student</th>
+            <th scope="col">Present?</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if searched %}
+        {% for event in events %}
+        <tr>
+            <th scope="row">{{ event.event }}</th>
+            <td>{{ event.student }}</td>
+            <td>{{ event.present }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        {% for attendance in attendance_list %}
+        <tr>
+            <th scope="row">{{ attendance.event }}</th>
+            <td>{{ attendance.student }}</td>
+            <td>{{ attendance.present }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+<script>
+    $(document).ready(function() {
+        $("#startButton").click(function() {
+            $.ajax({
+                url: 'scan_qrcode/true/',
+                method: 'GET',
+                success: function(data) {
+                    console.log(data);
+                }
+                
+            });
+        });
+    
+        $("#stopButton").click(function() {
+            $.ajax({
+                url: 'scan_qrcode/false/',
+                method: 'GET',
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+        });
+    });
+    const refreshTimer = document.getElementById('refresh-timer');
+
+let timerInSeconds = 0;
+
+setInterval(() => {
+  timerInSeconds += 1;
+
+//   refreshTimer.innerHTML = `Refreshing page in: ${timerInSeconds} seconds`;
+
+  if (timerInSeconds >= 5) {
+    window.location.reload();
+  }
+}, 1000);
+    </script>
+{% endblock %}
