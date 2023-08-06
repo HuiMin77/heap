@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Venue
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import calendar 
 from calendar import HTMLCalendar
 from datetime import datetime
@@ -9,8 +9,20 @@ from django.shortcuts import render
 from django.http import JsonResponse 
 from events.models import Event, Membership, CCA, Student, Attendance
 from .forms import VenueForm, EventForm, StudentForm
+<<<<<<< HEAD
 from django.core import serializers
 import re
+=======
+import cv2
+from pyzbar.pyzbar import decode
+import time
+from django.http import HttpResponse
+from django.http import StreamingHttpResponse, HttpResponse
+from pyzbar.pyzbar import decode
+import cv2
+import time
+
+>>>>>>> 1610aea5d739476961090644e92a58006cd82c68
 
 def home(request):
     # img = ['']
@@ -171,25 +183,50 @@ def add_membership(request, email):
         
         Membership.objects.create(student=student_instance, cca=cca_instance)
 
-def scan_QRCode():
+def generate_frames(status):
+   
+    print(status)
     cam = cv2.VideoCapture(0)
+   
+    last_scan_time = 0
+    scan_delay = 1  # Set the delay in seconds
+    delay_passed = True
+   
+    while status == 'true':
+        
+        cam.set(3, 640)
+        cam.set(4, 480)
 
-    cam.set(5, 640)
-    cam.set(6, 480)
-
-    camera = True
-    while camera == True:
         success, frame = cam.read()
+        if not success:
+            break
 
-        for i in decode(frame):
-            # print(i.type)
-            print(i.data.decode('utf-8'))
-            time.sleep(3)
+        current_time = time.time()
 
-            cv2.imshow("OurQr_Code_Scanner", frame)
-            cv2.waitKey(3)
+        if delay_passed and current_time - last_scan_time >= scan_delay:
+            for qr_code in decode(frame):
+                data = qr_code.data.decode('utf-8')
+                print('crying',data)
+               
+                last_scan_time = current_time  # Update last scan time
+                delay_passed = False  # Set the delay flag
 
+        _, buffer = cv2.imencode('.jpg', frame)
+        image_data = buffer.tobytes()
 
+        # Check if the delay has passed and reset the flag
+        if not delay_passed and current_time - last_scan_time >= scan_delay:
+            delay_passed = True
+        # yield (b'--frame\r\n'
+        #        b'Content-Type: image/jpeg\r\n\r\n' + image_data + b'\r\n')
+    
+    print(status)
+    if status == "false":
+        cam.release()  # Release the camera when status is 'false'\
+        cv2.destroyAllWindows()
+        # print('hi1',cam.isOpened())
+        return HttpResponse('hi')
 
+def scan_qrcode_view(request, status):
 
-
+    return StreamingHttpResponse(generate_frames(status), content_type='multipart/x-mixed-replace; boundary=frame')
