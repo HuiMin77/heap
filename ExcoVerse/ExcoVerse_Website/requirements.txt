@@ -1,4 +1,0 @@
-Django
-pytz
-stripe>=5.5.0
-aiogram>=2.25.1

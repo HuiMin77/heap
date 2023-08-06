@@ -18,6 +18,12 @@
   
   <title>Exco Verse</title>
 </head>
+<style>
+    body {
+    background-color: #333; /* Set your desired dark color code */
+    color: white;
+  }
+</style>
 
 <body>
   <div class="container-fluid">
@@ -30,6 +36,11 @@
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
             {% if user.is_authenticated %}
             <li class="nav-item">
+              <a href="{% url 'add-student' %}" class="nav-link align-middle px-0">
+                <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Register Students</span>
+              </a>
+            </li>
+            <li class="nav-item">
               <a href="{% url 'list-venues' %}" class="nav-link align-middle px-0">
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Venues</span>
               </a>
@@ -40,6 +51,23 @@
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Events</span>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="{% url 'list-events' %}" class="nav-link align-middle px-0">
+                <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">All Events</span>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'add-event' %}" class="nav-link align-middle px-0">
+                <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Add Event</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'attendance' %}" class="nav-link align-middle px-0">
+                <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Attendance</span>
+              </a>
+            </li>
+            
             <li class="nav-item">
               <a href="{% url 'logout' %}" class="nav-link align-middle px-0">
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Logout</span>

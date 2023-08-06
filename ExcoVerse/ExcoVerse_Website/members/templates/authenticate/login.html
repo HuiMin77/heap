@@ -1,7 +1,11 @@
 {% extends 'events/base.html' %}
 
 {% block content %}
-
+<style>
+   body {
+   color: white; /* Set your desired dark color code */
+  }
+</style>
     <h1>Login</h1>
         <form action="" method="POST">
             {% csrf_token %}

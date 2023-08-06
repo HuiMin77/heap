@@ -3,10 +3,9 @@ from . import views
 
 urlpatterns = [
     path('',views.home, name="home"),
+    path('add_event',views.add_event,name='add-event'),
     path('events',views.events, name="events"),
     path('venues',views.all_venues, name="list-venues"),
-    path('all_events/',views.all_events, name="all_events"),
-    path('add_event/', views.add_event, name='add_event'), 
     path('update/', views.update, name='update'),
     path('remove/', views.remove, name='remove'),
     path('add_venue',views.add_venue,name='add-venue'),
@@ -14,5 +13,10 @@ urlpatterns = [
     path('add_payment',views.add_payment,name='payment'),
     path('transfer_payment',views.transfer_payment,name='transfer-payment'),
     path('track_payments',views.track_event_payment_polls,name='track_payments'),
-    # path('add_event',views.add_event,name='add-event')
+    path('scan_qrcode/<str:status>/', views.scan_qrcode_view, name='scan_qrcode'),
+    path('attendance', views.get_attendance, name='attendance'),
+    path('all_events/',views.all_events, name="list-events"),
+
 ]
+
+
