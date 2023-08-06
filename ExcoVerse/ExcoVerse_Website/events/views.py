@@ -40,6 +40,18 @@ def events(request):
     }
     return render(request,'events/events.html',context)
  
+def all_cal_events(request):
+    event_list = Event.objects.all()
+    events_data = []
+    for event in event_list:
+        events_data.append({
+            'title': event.name,
+            'start': event.start_event_date.strftime("%Y-%m-%d %H:%M:%S"),
+            'end': event.end_event_date.strftime("%Y-%m-%d %H:%M:%S"),
+            'id': event.id,
+        })
+    return JsonResponse(events_data, safe=False)
+
 def all_events(request):
     event_list = Event.objects.all()
     # events_data = []
@@ -52,6 +64,7 @@ def all_events(request):
     #     })
     # return JsonResponse(events_data, safe=False)
     return render(request,'events/events-list.html',{'event_list':event_list})
+
 def add_event(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
@@ -91,6 +104,17 @@ def add_event(request):
             submitted = True
     return render(request, 'events/add_event.html', {'form': form, 'submitted': submitted})
 
+def add_cal_event(request):
+    title = request.GET.get("name", None)
+    start = request.GET.get("start", None)
+    end = request.GET.get("end", None)
+    form = EventForm(request.POST)
+    if form.is_valid():
+        form.save()
+    event = Event(title = title, start=start, end=end)
+    event.save()
+    data = {}
+    return JsonResponse(data)
 
 def add_attendance(request, student, event):
     if request.user.is_authenticated:

@@ -13,6 +13,7 @@ urlpatterns = [
     path('scan_qrcode/<str:status>/', views.scan_qrcode_view, name='scan_qrcode'),
     path('attendance', views.get_attendance, name='attendance'),
     path('all_events/',views.all_events, name="list-events"),
+    path('add_cal_event/',views.add_cal_event, name="add_cal_event"),
 ]
 
 

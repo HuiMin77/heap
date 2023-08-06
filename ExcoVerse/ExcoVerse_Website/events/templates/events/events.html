@@ -19,31 +19,53 @@
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            events: '/all_events',
+            // events: '/all_cal_events',
+
+            events: [
+                {
+                title  : 'event1',
+                start  : '2023-08-01'
+                },
+                {
+                title  : 'event2',
+                start  : '2023-08-07',
+                end    : '2023-08-01'
+                },
+                {
+                title  : 'event3',
+                start  : '2010-01-09 12:30:00',
+                allDay : false // will make the time show
+                }
+            ], 
+
             selectable: true,
             selectHelper: true,
             editable: true,
             eventLimit: true,
             timezone: 'Asia/Singapore',
+
             dayClick: function (date, jsEvent, view) {
                 var formattedDate = moment(date).format("MMMM YYYY");
                 $('#currentMonthYear').text(formattedDate);
             },
             select: function (start_event_date, end, allDay) {
                 var name = prompt("Enter Event name");
+                var description = prompt("Enter Description");
                 if (name) {
                     var start_event_date = moment(start_event_date).format("Y-MM-DD HH:mm:ss");
                     var end_event_date = moment(end).format("Y-MM-DD HH:mm:ss");
                     $.ajax({
                         type: "GET",
-                        url: '/add_event',
-                        data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date },
+                        url: '/add_cal_event',
+                        data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date, 'description': description},
                         dataType: "json",
                         success: function (data) {
+                            console.log(data)
                             calendar.fullCalendar('refetchEvents');
                             alert("Added Successfully");
                         },
                         error: function (data) {
+                            console.log(data)
                             alert('There is a problem!!!');
                         }
                     });
