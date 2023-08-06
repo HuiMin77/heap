@@ -1,8 +1,9 @@
 from django.db import models
-from members.models import UserProfile
+from members.models import UserProfile, User
 import random
 import string
 import hashlib
+import uuid
 
 # Create your models here.
 class CCA(models.Model):
@@ -69,6 +70,8 @@ class Attendance(models.Model):
         return self.student
     
 class PaymentPoll(models.Model):
+    # id = models.AutoField(primary_key=True)
+    # poll_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     subject = models.CharField('Subject', max_length=120)
     description = models.TextField('Description')
     price = models.DecimalField('Price', max_digits=8, decimal_places=2)
@@ -76,7 +79,8 @@ class PaymentPoll(models.Model):
     password = models.CharField(max_length=6)
     hashed_password = models.CharField(max_length=120)
     payment_event =  models.ForeignKey(Event, blank=True, null=True, on_delete=models.CASCADE)
-    stripe_account_id =  models.ForeignKey(UserProfile, blank=True, null=True, on_delete=models.CASCADE)
+    poll_creator =  models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    # stripe_account_id = models.CharField(max_length=120)
 
     def __str__(self):
         return self.subject
@@ -104,14 +108,19 @@ class PaymentPoll(models.Model):
         super().save(*args, **kwargs) 
 
 class PaymentDetails(models.Model):
+    poll_id = models.ForeignKey(PaymentPoll,blank=True, null=True,on_delete=models.CASCADE)  # Reference the poll_id field in PaymentPoll
+
     user_id = models.IntegerField()
     chat_id = models.IntegerField()
     payment_id = models.CharField(max_length=255)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3)
     payment_provider = models.CharField(max_length=255)
-    is_success = models.BooleanField(default=False)
+    is_success_excoverse = models.BooleanField(default=False)
+    is_success_club = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    # poll_creator =  models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    # stripe_account_id = models.CharField(max_length=255)
 
    
 

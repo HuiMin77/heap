@@ -1,6 +1,6 @@
 
 import logging
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import Bot, Dispatcher, executor, types, helper
 from aiogram.types import ReplyKeyboardMarkup,ReplyKeyboardRemove,KeyboardButton,LabeledPrice
 from aiogram.types.message import ContentType
 # from aiogram.dispatcher.storage import set_state
@@ -56,6 +56,7 @@ load_dotenv(dotenv_path)
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
+
 # Set the environment variable to point to your project's settings.py
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ExcoVerse_Website.settings')
 
@@ -67,6 +68,7 @@ django.setup()
 
 # Now you can import the PaymentPoll model
 from events.models import PaymentPoll, PaymentDetails
+from members.models import UserProfile
 
 #log
 logging.basicConfig(level=logging.INFO)
@@ -101,6 +103,7 @@ async def process_options(message: types.Message, state: FSMContext):
     # hashed_password = payment_poll.password
     decoded_password = hashlib.sha256(user_password.encode()).hexdigest()
     try:
+        global payment_poll
         payment_poll = await sync_to_async(PaymentPoll.objects.select_related('payment_event').get)(hashed_password=decoded_password)
 
 
@@ -128,6 +131,7 @@ async def process_options(message: types.Message, state: FSMContext):
             start_parameter='one-year-subscription',
             payload='test_invoice_payload'
         )
+        
         await state.reset_state()
 
     except ObjectDoesNotExist:
@@ -150,8 +154,17 @@ async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery):
 
 #successful payment
 @dp.message_handler(content_types=ContentType.SUCCESSFUL_PAYMENT)
+# def create_stripe_transfer(total_amount, stripe_account_id):
+        
+#     transfer = stripe.Transfer.create(
+#         amount=int(total_amount*100),
+#         currency="sgd",
+#         destination=stripe_account_id
+#     )
+#     return transfer
 async def successful_payment(message:types.Message):
-    print("Success")
+    
+    print("Successfully paid to bot")
     payment_info = message.successful_payment.to_python()
     for key,value in payment_info.items():
         print(f"{key}:{value}")
@@ -176,16 +189,37 @@ async def successful_payment(message:types.Message):
 
     # await bot.send_message(message.chat.id, f"Payment for the amount {message.successful_payment.total_amount //100} {message.successful_payment.currency} passed successfully!")
     try:
+        print("my payment poll",payment_poll.id)
+        poll_id = payment_poll.id
+        # creator_user = await sync_to_async(PaymentPoll.objects.get)()
+        # creator_user_profile = await sync_to_async(payment_poll.user_profile)  # Adjust field name accordingly
+        # creator_user_profile = await sync_to_async(PaymentPoll.objects.select_related('stripe_account_id').get)(user=creator_user)
+        # print("userprofile",creator_user_profile)
+        # Now you can use creator_user_profile.stripe_account_id to direct the payment to their Stripe account
+        # stripe_account_id = payment_poll.stripe_account_id
+        # print(stripe_account_id)
+        
+        # loop = asyncio.get_event_loop()
+        # result = await loop.run_in_executor(None, create_stripe_transfer, total_amount, stripe_account_id)
+            
+        # print("successfully paid back to user")
+
+        
         # Call the create method using sync_to_async
         await sync_to_async(PaymentDetails.objects.create)(
+            poll_id=payment_poll,
             user_id=user_id,
             chat_id=chat_id,
             payment_id=payment_id,
             total_amount=total_amount,
             currency=currency,
             payment_provider=payment_provider,
-            is_success=True,  # You can set this to True since the payment was successful
+            # You can set this to True since the payment was successful to the bot
+            is_success_excoverse=True,
+            # poll_creator=creator_user,
         )
+            
+        
 
         await bot.send_message(
             message.chat.id,
@@ -198,7 +232,16 @@ async def successful_payment(message:types.Message):
         # Handle other exceptions gracefully
         await bot.send_message(message.chat.id, "An error occurred. Please try again later.")
         logging.error(str(e))
-# def start_telegram_bot():
+
+#     async def create_stripe_transfer(total_amount, stripe_account_id):
+        
+#         transfer = await sync_to_async(stripe.Transfer.create(
+#             amount=total_amount,
+#             currency="sgd",
+#             destination=stripe_account_id
+#         ))
+#         return transfer
+# # def start_telegram_bot():
 
     #create new event loop for a thread
     # loop = asyncio.new_event_loop()
@@ -218,6 +261,7 @@ async def successful_payment(message:types.Message):
 #     loop.run_until_complete(start_telegram_bot_async())
 
 if __name__ == "__main__":
+    #  loop = asyncio.get_event_loop()
      executor.start_polling(dp, skip_updates=True)
     
 

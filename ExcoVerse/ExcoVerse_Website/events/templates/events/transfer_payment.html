@@ -1,0 +1,92 @@
+{% extends 'events/base.html' %}
+
+{% block content %}
+
+<h1>Payments</h1>
+<br>
+{% if user.is_authenticated %}
+<h2>Total Amount Sum: ${{ total_amount_sum }}</h2>
+
+
+<br>
+<ul>
+    {% for payment in payment_details_list %}
+    <div class="card">
+        <div class="card-header">
+          {{payment}}
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">: User_ID{{payment.user_id}}</h5>
+          <p class="card-text">
+            <ul>
+                <li>Chat ID: {{payment.chat_id}}</li>
+                
+            </ul>
+          </p>
+        </div>
+      </div>
+      
+        
+    
+    <br>
+    {% endfor %}
+    {% if total_amount_sum != 0 %}    
+    
+      <div class="card-footer text-muted">  
+        <!-- <script src="https://js.stripe.com/v3/"></script>
+        <button id="transferButton">Transfer Funds</button> -->
+        <form action="{% url 'transfer-payment' %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-secondary">Process Payment</button>
+        </form>
+
+        
+        <!-- <a href="{% url 'transfer-payment' %}" class="btn btn-secondary">Process Payment</a> -->
+        
+      </div>
+    {% endif %}
+  {% endif %}
+
+
+</ul>
+
+
+{% endblock %}
+<!-- <script>
+  var csrfToken = "{{ csrf_token }}";
+  console.log(csrfToken)
+</script> -->
+<!-- 
+<script>
+  const stripe = Stripe('pk_test_51NPQo0HLT8WmDutBCkrn879lFGyIlKoF64fhUuXS5WXyuyVC3y1ULJAsjedUlt4ob1W9jZsXKQE75QFRAfreTU3F009ydNs0jn');
+  
+  document.addEventListener('DOMContentLoaded', function () {
+      const transferButton = document.getElementById('transferButton');
+      transferButton.addEventListener('click', async function () {
+          try {
+              const response = await fetch('/initiate-transfer/', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': '{{ csrf_token }}', // Add CSRF token for Django
+                  },
+                  body: JSON.stringify({ /* any necessary data */ }),
+              });
+  
+              const data = await response.json();
+  
+              // Redirect to the appropriate URL or show a success message
+              // You might also want to handle any errors here
+          } catch (error) {
+              console.error('Error:', error);
+          }
+      });
+  });
+  </script> -->
+  
+<!-- stripe.Transfer.create(
+  amount=total_amount_sum,
+  currency="sgd",
+  destination=stripe_account_id,
+  transfer_group="ORDER_95",
+) -->
