@@ -70,7 +70,12 @@
                 <div class="card-body">
                   <h5 class="card-title">Plan Events</h5>
                   <p class="card-text">You can use this to plan your cca events</p>
-                  <a href="#" class="btn btn-primary">Let's Go</a>
+                  
+                  <!-- <a id="toggleLink" href='' class="btn btn-primary">Let's Go</a> -->
+                  <button class="btn btn-primary" id="startButton">Start</button>
+                  <button class="btn btn-primary" id="stopButton">Stop</button>
+               
+                  
                 </div>
               </div>
         </div>
@@ -87,4 +92,59 @@
     </div>
     
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    let state = false;  // Initial state
+
+    toggleLink.addEventListener("click", (event) => {
+        event.preventDefault();  // Prevent the default link behavior
+        state = !state;  // Toggle the state
+
+        // // Modify the link's href attribute to include the state
+        // const newState = state ? "true" : "false";
+        
+        // Use the 'state' value as needed
+        if (state) {
+            // Do something when state is true
+            console.log("State is true");
+            const toggleLink = document.getElementById("toggleLink");
+            toggleLink.setAttribute("href", "/scan_qrcode/true/");
+            window.location.href = toggleLink.href;
+
+        } else {
+            // Do something when state is false
+            console.log("State is false");
+            const toggleLink = document.getElementById("toggleLink");
+            toggleLink.setAttribute("href", "/scan_qrcode/false/");
+            window.location.href = toggleLink.href;
+        }
+    });});
+</script> -->
+
+<script>
+$(document).ready(function() {
+    $("#startButton").click(function() {
+        $.ajax({
+            url: 'scan_qrcode/true/',
+            method: 'GET',
+            success: function(data) {
+                console.log(data);
+            }
+        });
+    });
+
+    $("#stopButton").click(function() {
+        $.ajax({
+            url: 'scan_qrcode/false/',
+            method: 'GET',
+            success: function(data) {
+                console.log(data);
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}
