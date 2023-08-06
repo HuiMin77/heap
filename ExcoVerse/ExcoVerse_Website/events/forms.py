@@ -35,7 +35,6 @@ class EventForm(ModelForm):
             'internal':'Internal Event?',
             'attendees': 'Attendees',
             'description':'Description',
-
         }
         widgets = {
             'name':forms.TextInput(attrs={'class':'form-control','placeholder':'Event Name'}),
@@ -47,6 +46,7 @@ class EventForm(ModelForm):
             'description':forms.Textarea(attrs={'class':'form-control','placeholder':'Description'}),    
             
         }
+
 
 #Create a student form
 class StudentForm(ModelForm):
@@ -70,3 +70,14 @@ class StudentForm(ModelForm):
             'chat_id':forms.TextInput(attrs={'class':'form-control','placeholder':'Chat ID'})
         }
 
+
+class VenuesEventsForm(ModelForm):
+    venue = forms.ModelChoiceField(queryset=Venue.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+    class Meta:
+            model = Event
+            fields = ['name', 'start_event_date', 'end_event_date', 'description', 'venue']
+
+        # Optionally, you can customize the way the venue field is displayed as a dropdown
+    def __init__(self, *args, **kwargs):
+            super(EventForm, self).__init__(*args, **kwargs)
+            self.fields['venue'].widget.attrs.update({'class': 'form-control'})  # Add CSS class for styling
