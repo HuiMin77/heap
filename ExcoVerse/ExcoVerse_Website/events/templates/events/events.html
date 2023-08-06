@@ -31,12 +31,13 @@
             },
             select: function (start_event_date, end, allDay) {
                 var name = prompt("Enter Event name");
+                var 
                 if (name) {
                     var start_event_date = moment(start_event_date).format("Y-MM-DD HH:mm:ss");
                     var end_event_date = moment(end).format("Y-MM-DD HH:mm:ss");
                     $.ajax({
                         type: "GET",
-                        url: '/add_event',
+                        url: '/add_cal_event',
                         data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date },
                         dataType: "json",
                         success: function (data) {

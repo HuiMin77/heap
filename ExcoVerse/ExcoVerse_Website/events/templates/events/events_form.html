@@ -1,0 +1,29 @@
+{% extends 'events/base.html' %}
+
+{% block content %}
+<style>
+       body {
+   color: white; /* Set your desired dark color code */
+  }
+</style>
+{% if form.errors %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>There was an error with your form...</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+{% endif %}
+<!-- <div class="shadow p-4 mb-5 bg-body rounded"> -->
+<div>
+    <h1> Events </h1>
+    <form action="{% url 'register_user' %}" method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <br><br>
+        <input type="submit" value="Submit" class="btn btn-secondary">
+    </form>
+</div>
+
+<br /><br />
+
+{% endblock %}
