@@ -71,9 +71,7 @@
                   <h5 class="card-title">Plan Events</h5>
                   <p class="card-text">You can use this to plan your cca events</p>
                   
-                  <!-- <a id="toggleLink" href='' class="btn btn-primary">Let's Go</a> -->
-                  <button class="btn btn-primary" id="startButton">Start</button>
-                  <button class="btn btn-primary" id="stopButton">Stop</button>
+                  <a href="#" class="btn btn-primary">Let's Go</a>
                
                   
                 </div>
@@ -122,29 +120,5 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });});
 </script> -->
-
-<script>
-$(document).ready(function() {
-    $("#startButton").click(function() {
-        $.ajax({
-            url: 'scan_qrcode/true/',
-            method: 'GET',
-            success: function(data) {
-                console.log(data);
-            }
-        });
-    });
-
-    $("#stopButton").click(function() {
-        $.ajax({
-            url: 'scan_qrcode/false/',
-            method: 'GET',
-            success: function(data) {
-                console.log(data);
-            }
-        });
-    });
-});
-</script>
 
 {% endblock %}

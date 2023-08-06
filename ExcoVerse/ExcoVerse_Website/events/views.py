@@ -7,7 +7,7 @@ from datetime import datetime
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import JsonResponse 
-from events.models import Event, Membership, CCA, Student
+from events.models import Event, Membership, CCA, Student, Attendance
 from .forms import VenueForm, EventForm, StudentForm
 import cv2
 from pyzbar.pyzbar import decode
@@ -160,6 +160,7 @@ def generate_frames(status):
             for qr_code in decode(frame):
                 data = qr_code.data.decode('utf-8')
                 print('crying',data)
+                take_attendance(data)
                
                 last_scan_time = current_time  # Update last scan time
                 delay_passed = False  # Set the delay flag
@@ -180,6 +181,45 @@ def generate_frames(status):
         # print('hi1',cam.isOpened())
         return HttpResponse('hi')
 
-def scan_qrcode_view(request, status):
+def scan_qrcode_view(request,status):
 
     return StreamingHttpResponse(generate_frames(status), content_type='multipart/x-mixed-replace; boundary=frame')
+
+def take_attendance(data):
+    print(data)
+    split_parts = data.split('-')
+    attendance_list = Attendance.objects.all()
+    print(attendance_list)
+    
+    for attendance in attendance_list:
+        print('event',attendance.event.name)
+        print(split_parts[0])
+        full_name =  attendance.student.first_name + ' '+ attendance.student.last_name
+        print(full_name)
+        print(str(split_parts[1]))
+        if full_name == str(split_parts[0]) and attendance.event.name == str(split_parts[1]):
+            print('hi')
+            attendanceDB = Attendance.objects.get(id=attendance.id)
+            print("Primary key:", attendanceDB.id)  # Access the primary key using 'id'
+            attendanceDB.student = attendance.student
+            attendanceDB.event = attendance.event
+            attendanceDB.present = True
+            attendanceDB.save()
+            data = {}
+            return JsonResponse(data)
+        else:
+            print('gg.com')
+
+def get_attendance(request):
+    #note random order would be order_by(?)
+    if request.method == "POST":
+        searched = request.POST['searched']
+        if searched == '':
+            attendance_list = Attendance.objects.all()
+            return render(request,'events/attendance.html',{'attendance_list':attendance_list})
+        events = Attendance.objects.filter(event__name__contains=searched)  # Assuming 'event' is a ForeignKey to an Event model with a 'name' field
+        return render(request,'events/attendance.html',{'searched':searched,'events':events})
+        
+    else:
+        attendance_list = Attendance.objects.all()
+        return render(request,'events/attendance.html',{'attendance_list':attendance_list})

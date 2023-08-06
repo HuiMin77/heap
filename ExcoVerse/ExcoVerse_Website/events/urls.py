@@ -11,7 +11,8 @@ urlpatterns = [
     path('remove/', views.remove, name='remove'),
     path('add_venue',views.add_venue,name='add-venue'),
     path('add_student',views.add_student,name='add-student'),
-    path('scan_qrcode/<str:status>/', views.scan_qrcode_view, name='scan_qrcode'),
+     path('scan_qrcode/<str:status>/', views.scan_qrcode_view, name='scan_qrcode'),
+     path('attendance', views.get_attendance, name='attendance'),
 ]
 
 
