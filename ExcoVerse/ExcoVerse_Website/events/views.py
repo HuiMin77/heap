@@ -17,6 +17,7 @@ from django.http import StreamingHttpResponse, HttpResponse
 from pyzbar.pyzbar import decode
 import cv2
 import time
+import re
 
 
 def home(request):
@@ -70,12 +71,18 @@ def add_event(request):
             event = form.save()  # Save the event
             attendees = form.cleaned_data.get('attendees')
 
-            for email in attendees:
-                print(email)
+            for attendee in attendees:
+                print(attendee)
+
+                student_id = re.search(r'\d+', str(attendee)).group()
+
+                print(student_id)
+
                 # Split the student name into first name and last name
-                student_instance, student_created = Student.objects.get_or_create(email=email)
+                student_instance, student_created = Student.objects.get_or_create(student_id=student_id)
 
                 add_attendance(request, student=student_instance, event=event)
+
 
             return HttpResponseRedirect('/add_event?submitted=True')
     else:  
@@ -84,13 +91,20 @@ def add_event(request):
             submitted = True
     return render(request, 'events/add_event.html', {'form': form, 'submitted': submitted})
 
+
 def add_attendance(request, student, event):
-    print(student)
     if request.user.is_authenticated:
-        print('yolo',student)
+
+        print('student')
+        print(student)
+
+        print('event')
+        print(event)
+
         # Get or create the event instance
         # Create the attendance record
-        Attendance.objects.create(student=student, event=event, present=False)
+        attendance, created = Attendance.objects.get_or_create(student=student, event=event, present=False )
+        attendance.save()
  
 def update(request):
     start_event_date = request.GET.get("start_event_date", None)
@@ -224,7 +238,7 @@ def take_attendance(data):
     for attendance in attendance_list:
         print('event',attendance.event.name)
         print(split_parts[0])
-        full_name =  attendance.student.first_name + ' '+ attendance.student.last_name
+        full_name =  attendance.student.first_name + ' '+ attendance.student.last_name + ' '+ str(attendance.student.student_id)
         print(full_name)
         print(str(split_parts[1]))
         if full_name == str(split_parts[0]) and attendance.event.name == str(split_parts[1]):
