@@ -54,19 +54,19 @@ def all_events(request):
     return render(request, 'events/events-list.html',
                   {'event_list':events_list})
  
-# def add_event(request):
-#     start_event_date = request.GET.get("start_event_date", None)
-#     end_event_date = request.GET.get("end_event_date", None)
-#     description = request.GET.get("description", None)
-#     form = EventForm(request.POST)
-#     if form.is_valid():
-#         form.save()
-#     venue_id = request.GET.get("venue_id", None)
-#     name = request.GET.get("name", None)
-#     event = Event(name=str(name), start_event_date=start_event_date, end_event_date=end_event_date, description=description, venue_id=venue_id)
-#     event.save()
-#     data = {}
-#     return JsonResponse(data)
+def add_cal_event(request):
+    start_event_date = request.GET.get("start_event_date", None)
+    end_event_date = request.GET.get("end_event_date", None)
+    description = request.GET.get("description", None)
+    form = EventForm(request.POST)
+    if form.is_valid():
+        form.save()
+    venue_id = request.GET.get("venue_id", None)
+    name = request.GET.get("name", None)
+    event = Event(name=str(name), start_event_date=start_event_date, end_event_date=end_event_date, description=description, venue_id=venue_id)
+    event.save()
+    data = {}
+    return JsonResponse(data)
 
 def add_event(request):
     if request.method == 'POST':
@@ -77,7 +77,7 @@ def add_event(request):
             # (e.g., redirect to a success page or show a success message)
     else:
         form = EventForm()
-    return render(request, 'events/add_event.html', {'form': form})
+    return render(request, 'events/add_cal_event.html', {'form': form})
  
 def update(request):
     start_event_date = request.GET.get("start_event_date", None)

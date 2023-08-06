@@ -51,6 +51,19 @@
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Events</span>
               </a>
             </li>
+
+            <li class="nav-item">
+              <a href="{% url 'list-events' %}" class="nav-link align-middle px-0">
+                <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">All Events</span>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'add-event' %}" class="nav-link align-middle px-0">
+                <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Add Event</span>
+              </a>
+            </li>
+
             
             <li class="nav-item">
               <a href="{% url 'logout' %}" class="nav-link align-middle px-0">
