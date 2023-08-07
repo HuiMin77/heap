@@ -86,9 +86,11 @@ def add_event(request):
                 student_instance, student_created = Student.objects.get_or_create(student_id=student_id)
                 
                 add_attendance(request, student=student_instance, event=event)
-                
-            send_QRcode(event)
-        return HttpResponseRedirect('/add_event?submitted=True')
+
+
+        send_QRcode(event)
+        return HttpResponseRedirect('events')
+
     else:  
         form = EventForm
         if 'submitted' in request.GET:
@@ -112,12 +114,12 @@ def add_attendance(request, student, event):
         attendance, created = Attendance.objects.get_or_create(student=student, event=event, present=False,manager=username)
         attendance.save()
  
-def remove(request):
-    id = request.GET.get("id", None)
+def remove(request, id):
+    # id = request.GET.get("id", None)
     event = Event.objects.get(id=id)
     event.delete()
     data = {}
-    return JsonResponse(data)
+    return HttpResponseRedirect('/all_events')
 
 def add_venue(request):
     submitted = False
@@ -392,7 +394,7 @@ def generate_frames(status):
             delay_passed = True
 
         # Implement image data handling or streaming if needed
-        
+      
     print(status)
     if status == "false":
         try:
@@ -433,23 +435,31 @@ def take_attendance(data):
         else:
             print('Not Working')
 
-def get_attendance(request):
+def get_attendance(request,id):
     #note random order would be order_by(?)
-    if request.method == "POST":
-        searched = request.POST['searched']
-        if searched == '':
-            if request.user.is_authenticated:
-                username = request.user.username
-                attendance_list = Attendance.objects.filter(manager=username)
-                return render(request,'events/attendance.html',{'attendance_list':attendance_list})
-        events = Attendance.objects.filter(event__name__contains=searched)  # Assuming 'event' is a ForeignKey to an Event model with a 'name' field
-        return render(request,'events/attendance.html',{'searched':searched,'events':events})
-        
+    # if request.method == "POST":
+    #     searched = request.POST['searched']
+    #     if searched == '':
+    #         if request.user.is_authenticated:
+    #             username = request.user.username
+    #             attendance_list = Attendance.objects.filter(manager=username)
+    #             return render(request,'events/attendance.html',{'attendance_list':attendance_list})
+    #     events = Attendance.objects.filter(event__name__contains=searched)  # Assuming 'event' is a ForeignKey to an Event model with a 'name' field
+    #     return render(request,'events/attendance.html',{'searched':searched,'events':events})
+    id = str(id)
     # else:
     if request.user.is_authenticated:
         username = request.user.username
-        attendance_list = Attendance.objects.filter(manager=username)
-        return render(request,'events/attendance.html',{'attendance_list':attendance_list})
+        
+        print(username)
+        print(id)
+        manager_list = Attendance.objects.filter(manager=username)
+        list1 = manager_list.filter(id=id)
+        list2 = Attendance.objects.filter(event__id=id)
+        # attendance_list = Attendance.objects.filter(manager=username,id=id)
+        print(list1)
+        
+        return render(request,'events/attendance.html',{'attendance_list':list2})
 
 
  

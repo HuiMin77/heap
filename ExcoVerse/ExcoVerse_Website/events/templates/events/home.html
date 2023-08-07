@@ -76,7 +76,7 @@
                   <p class="card-text">Taking Attendance has never been easier with this feature</p>
                   
                   {% if user.is_authenticated %}
-                  <a href="{% url 'attendance' %}" class="btn btn-primary">Let's Go</a>
+                  <a href="{% url 'list-events' %}" class="btn btn-primary">Let's Go</a>
                   {% else %}
                   <a href="{% url 'login' %}" class="btn btn-primary">Login to Unlock</a>
                   {% endif %}

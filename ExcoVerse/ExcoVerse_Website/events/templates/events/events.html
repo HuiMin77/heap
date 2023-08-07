@@ -3,12 +3,24 @@
 <div class="container">
     <div class="row">
         <h4>Events for Exco</h4>
-        <a href="">
-            <button type="button" class="btn btn-secondary float-end mb-5 mr-5">Add Event</button>
-          </a> 
-        <div class="col-md-12">    
-            <div id='calendar'></div> 
-        </div> 
+
+        <div class="row">
+            <div class="col">
+                <i><p>Note: Please delete the event by clicking on it</p></i>
+            </div>
+            <div class="col">
+                <a href="{% url 'add-event'%}">
+                    <button type="button" class="btn btn-secondary float-end mb-5 mr-5">Add Event</button>
+                </a>
+
+            </div>
+        </div>
+
+
+
+        <div class="col-md-12">
+            <div id='calendar'></div>
+        </div>
     </div>
 </div>
 <script>
@@ -34,24 +46,24 @@
 
             select: function (start_event_date, end, allDay) {
                 var data = {
-                'start_event_date': start.toISOString(),  // Convert to ISO 8601 format
-                'end_event_date': end.toISOString(), 
+                    'start_event_date': start.toISOString(),  // Convert to ISO 8601 format
+                    'end_event_date': end.toISOString(),
                 }
 
-                    $.ajax({
-                        url: '/update_calendar',  // Replace with the correct URL to handle the update_calendar view on the server-side.
-                        method: 'POST',  // Use the appropriate HTTP method (POST, GET, etc.) based on your server-side implementation.
-                        data: data,  // The data to be sent to the server.
-                        dataType: 'json',
-                        success: function (data) {
-                            calendar.fullCalendar('refetchEvents');
-                            alert('Added Successfully');
-                            console.log(data);
-                        },
-                        error: function (data) {
-                            alert('There is a problem!!!');
-                        }
-                    });
+                $.ajax({
+                    url: '/update_calendar',  // Replace with the correct URL to handle the update_calendar view on the server-side.
+                    method: 'POST',  // Use the appropriate HTTP method (POST, GET, etc.) based on your server-side implementation.
+                    data: data,  // The data to be sent to the server.
+                    dataType: 'json',
+                    success: function (data) {
+                        calendar.fullCalendar('refetchEvents');
+                        alert('Added Successfully');
+                        console.log(data);
+                    },
+                    error: function (data) {
+                        alert('There is a problem!!!');
+                    }
+                });
             },
             eventResize: function (event) {
                 var start_event_date = moment(event.start).format("Y-MM-DD HH:mm:ss");
@@ -64,7 +76,7 @@
                     data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date, 'id': id },
                     dataType: "json",
                     success: function (data) {
-                        
+
                         calendar.fullCalendar('refetchEvents');
                         alert('Event Update');
                     },
@@ -113,22 +125,22 @@
                 }
             },
 
-            eventMouseover: function(calEvent, jsEvent) {
+            eventMouseover: function (calEvent, jsEvent) {
                 console.log(calEvent)
 
                 var tooltip = '<div class="tooltipevent" style="width:100px;height:100px;background:#ccc;position:absolute;z-index:10001;">' + calEvent.title + ', description: ' + calEvent.description + '</div>';
                 $("body").append(tooltip);
-                $(this).mouseover(function(e) {
+                $(this).mouseover(function (e) {
                     $(this).css('z-index', 10000);
                     $('.tooltipevent').fadeIn('500');
                     $('.tooltipevent').fadeTo('10', 1.9);
-                }).mousemove(function(e) {
+                }).mousemove(function (e) {
                     $('.tooltipevent').css('top', e.pageY + 10);
                     $('.tooltipevent').css('left', e.pageX + 20);
                 });
             },
 
-            eventMouseout: function(calEvent, jsEvent) {
+            eventMouseout: function (calEvent, jsEvent) {
                 $(this).css('z-index', 8);
                 $('.tooltipevent').remove();
             },
