@@ -9,6 +9,7 @@ from django.shortcuts import render
 
 # from django.http import JsonResponse 
 from events.models import Event, Membership, PaymentDetails, PaymentPoll, Tracking_Payment, Student, CCA, Attendance
+from events.emailing import send_QRcode
 from .forms import VenueForm, EventForm, StudentForm, PaymentForm, EventSelectionForm
 from members.models import UserProfile, User
 from django.db.models import Sum
@@ -85,13 +86,15 @@ def add_event(request):
                 student_instance, student_created = Student.objects.get_or_create(student_id=student_id)
                 
                 add_attendance(request, student=student_instance, event=event)
-
-
+                
+            send_QRcode(event)
         return HttpResponseRedirect('/add_event?submitted=True')
     else:  
         form = EventForm
         if 'submitted' in request.GET:
             submitted = True
+
+    
     return render(request, 'events/add_event.html', {'form': form, 'submitted': submitted})
 
 
