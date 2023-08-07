@@ -56,6 +56,7 @@ class Event(models.Model):
     attendees = models.ManyToManyField(Student, blank=True, null=True)
     internal = models.BooleanField(default=False)
     description = models.TextField(blank=True)
+    manager = models.CharField('Manager', max_length=120, blank=True)
     
     def __str__(self):
         return self.name

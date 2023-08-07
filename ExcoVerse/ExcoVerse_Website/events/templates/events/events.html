@@ -19,7 +19,9 @@
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            events: '/all_events',
+            events: '/all_cal_events',
+
+
             selectable: true,
             selectHelper: true,
             editable: true,
@@ -29,25 +31,27 @@
                 var formattedDate = moment(date).format("MMMM YYYY");
                 $('#currentMonthYear').text(formattedDate);
             },
+
             select: function (start_event_date, end, allDay) {
-                var name = prompt("Enter Event name");
-                if (name) {
-                    var start_event_date = moment(start_event_date).format("Y-MM-DD HH:mm:ss");
-                    var end_event_date = moment(end).format("Y-MM-DD HH:mm:ss");
+                var data = {
+                'start_event_date': start.toISOString(),  // Convert to ISO 8601 format
+                'end_event_date': end.toISOString(), 
+                }
+
                     $.ajax({
-                        type: "GET",
-                        url: '/add_event',
-                        data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date },
-                        dataType: "json",
+                        url: '/update_calendar',  // Replace with the correct URL to handle the update_calendar view on the server-side.
+                        method: 'POST',  // Use the appropriate HTTP method (POST, GET, etc.) based on your server-side implementation.
+                        data: data,  // The data to be sent to the server.
+                        dataType: 'json',
                         success: function (data) {
                             calendar.fullCalendar('refetchEvents');
-                            alert("Added Successfully");
+                            alert('Added Successfully');
+                            console.log(data);
                         },
                         error: function (data) {
                             alert('There is a problem!!!');
                         }
                     });
-                }
             },
             eventResize: function (event) {
                 var start_event_date = moment(event.start).format("Y-MM-DD HH:mm:ss");
@@ -60,6 +64,7 @@
                     data: { 'name': name, 'start_event_date': start_event_date, 'end_event_date': end_event_date, 'id': id },
                     dataType: "json",
                     success: function (data) {
+                        
                         calendar.fullCalendar('refetchEvents');
                         alert('Event Update');
                     },
@@ -107,7 +112,28 @@
                     });
                 }
             },
+
+            eventMouseover: function(calEvent, jsEvent) {
+                console.log(calEvent)
+
+                var tooltip = '<div class="tooltipevent" style="width:100px;height:100px;background:#ccc;position:absolute;z-index:10001;">' + calEvent.title + ', description: ' + calEvent.description + '</div>';
+                $("body").append(tooltip);
+                $(this).mouseover(function(e) {
+                    $(this).css('z-index', 10000);
+                    $('.tooltipevent').fadeIn('500');
+                    $('.tooltipevent').fadeTo('10', 1.9);
+                }).mousemove(function(e) {
+                    $('.tooltipevent').css('top', e.pageY + 10);
+                    $('.tooltipevent').css('left', e.pageX + 20);
+                });
+            },
+
+            eventMouseout: function(calEvent, jsEvent) {
+                $(this).css('z-index', 8);
+                $('.tooltipevent').remove();
+            },
         });
     });
+
 </script>
 {% endblock %}

@@ -45,42 +45,34 @@ def all_venues(request):
  
 # Create your views here.
 def events(request):  
-    all_events = Event.objects.all()
-    context = {
-        "events":all_events,
-    }
-    return render(request,'events/events.html',context)
+     if request.user.is_authenticated:
+        username = request.user.username
+        all_events = Event.objects.filter(manager=username)
+        print('anushka',all_events)
+        context = {
+            "events":all_events,
+        }
+        return render(request,'events/events.html',context)
  
-def all_events(request):
-    event_list = Event.objects.all()
-    # events_data = []
-    # for event in all_events:
-    #     events_data.append({
-    #         'title': event.name,
-    #         'start': event.start_event_date.strftime("%Y-%m-%d %H:%M:%S"),
-    #         'end': event.end_event_date.strftime("%Y-%m-%d %H:%M:%S"),
-    #         'id': event.id,
-    #     })
-    # return JsonResponse(events_data, safe=False)
-    return render(request,'events/events-list.html',{'event_list':event_list})
-def add_event(request):
-    if request.method == 'POST':
-        form = EventForm(request.POST)
-        if form.is_valid():
-            form.save()
-            # Handle successful form submission
-            # (e.g., redirect to a success page or show a success message)
-    else:
-        form = EventForm()
-    return render(request, 'events/add_event.html', {'form': form})
 
 def add_event(request):
     submitted = False
     if request.method == "POST":
         form = EventForm(request.POST)
         if form.is_valid():
-            event = form.save()  # Save the event
+            name = form.cleaned_data.get('name')
+            start_event_date = form.cleaned_data.get('start_event_date')
+            end_event_date = form.cleaned_data.get('end_event_date')
+            venue = form.cleaned_data.get('venue')
+            internal = form.cleaned_data.get('internal')
             attendees = form.cleaned_data.get('attendees')
+            description = form.cleaned_data.get('description')
+            if request.user.is_authenticated:
+                username = request.user.username
+            
+                event = Event(name=str(name), start_event_date=start_event_date, end_event_date=end_event_date, venue=venue,internal=internal,description=description, manager=username)
+                event.save()
+            
 
             for attendee in attendees:
                 print(attendee)
@@ -91,11 +83,11 @@ def add_event(request):
 
                 # Split the student name into first name and last name
                 student_instance, student_created = Student.objects.get_or_create(student_id=student_id)
-
+                
                 add_attendance(request, student=student_instance, event=event)
 
 
-            return HttpResponseRedirect('/add_event?submitted=True')
+        return HttpResponseRedirect('/add_event?submitted=True')
     else:  
         form = EventForm
         if 'submitted' in request.GET:
@@ -116,19 +108,6 @@ def add_attendance(request, student, event):
         # Create the attendance record
         attendance, created = Attendance.objects.get_or_create(student=student, event=event, present=False,manager=username)
         attendance.save()
- 
-def update(request):
-    start_event_date = request.GET.get("start_event_date", None)
-    end_event_date = request.GET.get("end_event_date", None)
-    name = request.GET.get("name", None)
-    id = request.GET.get("id", None)
-    event = Event.objects.get(id=id)
-    event.start_event_date = start_event_date
-    event.end_event_date = end_event_date
-    event.name = name
-    event.save()
-    data = {}
-    return JsonResponse(data)
  
 def remove(request):
     id = request.GET.get("id", None)
@@ -370,32 +349,35 @@ def add_membership(request, student_id):
         Membership.objects.create(student=student_instance, cca=cca_instance)
 
 
-def generate_frames(status):
    
+def generate_frames(status):
     print(status)
     cam = cv2.VideoCapture(0)
-   
+
+    if not cam.isOpened():
+        print("Error: Camera not opened.")
+        return HttpResponse("Camera not opened.")
+
     last_scan_time = 0
     scan_delay = 1  # Set the delay in seconds
     delay_passed = True
-   
+
     while status == 'true':
+        ret, frame = cam.read()
+        
+        if not ret:
+            break
         
         cam.set(3, 640)
         cam.set(4, 480)
-
-        success, frame = cam.read()
-        if not success:
-            break
 
         current_time = time.time()
 
         if delay_passed and current_time - last_scan_time >= scan_delay:
             for qr_code in decode(frame):
                 data = qr_code.data.decode('utf-8')
-                print('crying',data)
+                print('QR Code Data:', data)
                 take_attendance(data)
-               
                 last_scan_time = current_time  # Update last scan time
                 delay_passed = False  # Set the delay flag
 
@@ -405,22 +387,22 @@ def generate_frames(status):
         # Check if the delay has passed and reset the flag
         if not delay_passed and current_time - last_scan_time >= scan_delay:
             delay_passed = True
-        # yield (b'--frame\r\n'
-        #        b'Content-Type: image/jpeg\r\n\r\n' + image_data + b'\r\n')
-    
+
+        # Implement image data handling or streaming if needed
+        
     print(status)
     if status == "false":
         try:
-            print('camera is being released')
+            print('Releasing camera')
             cam.release()
+            cv2.destroyAllWindows()
         except Exception as e:
             print("Error releasing camera:", e)
-        cv2.destroyAllWindows()
-        # print('hi1',cam.isOpened())
-        return HttpResponse('hi')
+        
+        return HttpResponse("Camera released.")
 
 def scan_qrcode_view(request,status):
-
+    print('cam status',status)
     return StreamingHttpResponse(generate_frames(status), content_type='multipart/x-mixed-replace; boundary=frame')
 
 def take_attendance(data):
@@ -466,3 +448,109 @@ def get_attendance(request):
         attendance_list = Attendance.objects.filter(manager=username)
         return render(request,'events/attendance.html',{'attendance_list':attendance_list})
 
+
+ 
+def all_cal_events(request):
+    if request.user.is_authenticated:
+        username = request.user.username
+        events_list = Event.objects.filter(manager=username)
+        events_data = []
+        for event in events_list:
+            events_data.append({
+                'title': event.name,
+                'start': event.start_event_date.strftime("%Y-%m-%d %H:%M:%S"),
+                'end': event.end_event_date.strftime("%Y-%m-%d %H:%M:%S"),
+                'id': event.id,
+                'description': event.description, 
+                'venue_id': event.venue_id,
+            })
+            
+        return JsonResponse(events_data, safe=False)
+
+def all_events(request):
+    if request.user.is_authenticated:
+        username = request.user.username
+        events_list = Event.objects.filter(manager=username)
+        # events_data = []
+        # for event in all_events:
+        #     events_data.append({
+        #         'title': event.name,
+        #         'start': event.start_event_date.strftime("%Y-%m-%d %H:%M:%S"),
+        #         'end': event.end_event_date.strftime("%Y-%m-%d %H:%M:%S"),
+        #         'id': event.id,
+        #         'description': event.description, 
+        #         'venue_id': event.venue_id,
+        #      })
+        # return JsonResponse(events_data, safe=False)
+
+        return render(request, 'events/events-list.html',
+                    {'event_list':events_list})
+ 
+def add_calendar_event(request):
+    start_event_date = request.GET.get("start_event_date", None)
+    end_event_date = request.GET.get("end_event_date", None)
+    description = request.GET.get("description", None)
+    form = EventForm(request.POST)
+    if form.is_valid():
+        form.save()
+    name = request.GET.get("name", None)
+    event = Event(name=str(name), start_event_date=start_event_date, end_event_date=end_event_date, description=description)
+    event.save()
+    data = {}
+    return JsonResponse(data)
+
+def add_calendar_event(request):
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Handle successful form submission
+            # (e.g., redirect to a success page or show a success message)
+    else:
+        form = EventForm()
+    return render(request, 'events/add_event.html', {'form': form})
+
+from django.utils import timezone
+
+def update_calendar(request, event):
+    # Assuming 'name', 'start_event_date', 'end_event_date', and 'description'
+    # are parameters passed in the GET request.
+
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Handle successful form submission
+            # (e.g., redirect to a success page or show a success message)
+
+            event.name = request.GET.get("name", event.name)
+            event.description = request.GET.get("description", event.description)
+
+            start_event_date = request.GET.get("start_event_date", None)
+            if start_event_date:
+                event.start_event_date = datetime.strptime(start_event_date, "%Y-%m-%dT%H:%M:%S")
+
+            end_event_date = request.GET.get("end_event_date", None)
+            if end_event_date:
+                event.end_event_date = datetime.strptime(end_event_date, "%Y-%m-%dT%H:%M:%S")
+        
+            event.save()
+            print('this is the data')
+
+            data = {'name': event.name, 'start_event_date': event.start_event_date, 'end_event_date': event.end_event_date, 'description': event.description }, 
+            
+            print(data) # You can add any data you want to return as a JSON response.
+            return JsonResponse(data, safe=False)
+    else:
+        form = EventForm
+        if 'submitted' in request.GET:
+            submitted = True
+    return render(request, 'events/add_event.html', {'form': form, 'submitted': submitted})
+
+def update(request):
+    start_event_date = request.GET.get("start_event_date", None)
+    end_event_date = request.GET.get("end_event_date", None)
+    name = request.GET.get("name", None)
+    id = request.GET.get("id", None)
+    event = Event.objects.get(id=id)
+    event.start_event
