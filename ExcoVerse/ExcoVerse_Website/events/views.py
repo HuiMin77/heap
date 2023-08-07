@@ -86,13 +86,15 @@ def add_event(request):
                 student_instance, student_created = Student.objects.get_or_create(student_id=student_id)
                 
                 add_attendance(request, student=student_instance, event=event)
-                send_QRcode(event)
-
+                
+            send_QRcode(event)
         return HttpResponseRedirect('/add_event?submitted=True')
     else:  
         form = EventForm
         if 'submitted' in request.GET:
             submitted = True
+
+    
     return render(request, 'events/add_event.html', {'form': form, 'submitted': submitted})
 
 
