@@ -88,7 +88,7 @@ def add_event(request):
                 add_attendance(request, student=student_instance, event=event)
 
 
-        send_QRcode(event)
+        # send_QRcode(event)
         return HttpResponseRedirect('events')
 
     else:  
@@ -355,7 +355,7 @@ def add_membership(request, student_id):
 
 
    
-def generate_frames(status):
+def generate_frames(request,status):
     print(status)
     cam = cv2.VideoCapture(0)
 
@@ -382,7 +382,7 @@ def generate_frames(status):
             for qr_code in decode(frame):
                 data = qr_code.data.decode('utf-8')
                 print('QR Code Data:', data)
-                take_attendance(data)
+                take_attendance(request,data)
                 last_scan_time = current_time  # Update last scan time
                 delay_passed = False  # Set the delay flag
 
@@ -408,9 +408,9 @@ def generate_frames(status):
 
 def scan_qrcode_view(request,status):
     print('cam status',status)
-    return StreamingHttpResponse(generate_frames(status), content_type='multipart/x-mixed-replace; boundary=frame')
+    return StreamingHttpResponse(generate_frames(request,status), content_type='multipart/x-mixed-replace; boundary=frame')
 
-def take_attendance(data):
+def take_attendance(request,data):
     print(data)
     split_parts = data.split('-')
     attendance_list = Attendance.objects.all()
@@ -420,18 +420,26 @@ def take_attendance(data):
         print('event',attendance.event.name)
         print(split_parts[0])
         full_name =  attendance.student.first_name + ' '+ attendance.student.last_name + ' '+ str(attendance.student.student_id)
-        print(full_name)
-        print(str(split_parts[1]))
-        if full_name == str(split_parts[0]) and attendance.event.name == str(split_parts[1]):
+        print(attendance.manager)
+        username = ''
+        if request.user.is_authenticated:
+            username1 = request.user.username
+            username += username1
+       
+        if full_name == str(split_parts[0]) and attendance.event.name == str(split_parts[1]) and attendance.manager == username:
             print('hi')
-            attendanceDB = Attendance.objects.get(id=attendance.id)
-            print("Primary key:", attendanceDB.id)  # Access the primary key using 'id'
-            attendanceDB.student = attendance.student
-            attendanceDB.event = attendance.event
-            attendanceDB.present = True
-            attendanceDB.save()
-            data = {}
-            return JsonResponse(data)
+            try:
+                attendanceDB = Attendance.objects.get(id=attendance.id)
+                print("Primary key:", attendanceDB.id)  # Access the primary key using 'id'
+                attendanceDB.student = attendance.student
+                attendanceDB.event = attendance.event
+                attendanceDB.manager = attendance.manager
+                attendanceDB.present = True
+                attendanceDB.save()
+                data = {}
+                return JsonResponse(data)
+            except Attendance.DoesNotExist:
+                print("Attendance not found")
         else:
             print('Not Working')
 
