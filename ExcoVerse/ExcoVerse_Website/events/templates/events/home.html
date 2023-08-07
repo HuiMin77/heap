@@ -60,30 +60,41 @@
                 <div class="card-body">
                   <h5 class="card-title">Plan Events</h5>
                   <p class="card-text">You can use this to plan your cca events</p>
-                  <a href="#" class="btn btn-primary">Let's Go</a>
+                  {% if user.is_authenticated %}
+                  <a href="{% url 'add-event' %}" class="btn btn-primary">Let's Go</a>
+                  {% else %}
+                  <a href="{% url 'login' %}" class="btn btn-primary">Login to Unlock</a>
+                  {% endif %}
                 </div>
               </div>
         </div>
         <div class="col">
             <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="https://d2ydtwisqcxv72.cloudfront.net/211020-Google-Calendar-Planning-Blog.jpg" alt="Card image cap">
+                <img class="card-img-top" src="https://static.vecteezy.com/system/resources/thumbnails/004/971/649/small/office-software-attendance-management-business-concept-infographics-for-web-banner-calendar-task-list-and-chart-the-user-personal-account-vector.jpg" alt="Card image cap">
                 <div class="card-body">
-                  <h5 class="card-title">Plan Events</h5>
-                  <p class="card-text">You can use this to plan your cca events</p>
+                  <h5 class="card-title">Take Attendance</h5>
+                  <p class="card-text">Taking Attendance has never been easier with this feature</p>
                   
-                  <a href="#" class="btn btn-primary">Let's Go</a>
-               
+                  {% if user.is_authenticated %}
+                  <a href="{% url 'attendance' %}" class="btn btn-primary">Let's Go</a>
+                  {% else %}
+                  <a href="{% url 'login' %}" class="btn btn-primary">Login to Unlock</a>
+                  {% endif %}
                   
                 </div>
               </div>
         </div>
         <div class="col">
             <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="https://d2ydtwisqcxv72.cloudfront.net/211020-Google-Calendar-Planning-Blog.jpg" alt="Card image cap">
+                <img class="card-img-top" src="https://st2.depositphotos.com/4320929/11180/v/600/depositphotos_111804622-stock-illustration-online-and-mobile-payments-concept.jpg" alt="Card image cap">
                 <div class="card-body">
-                  <h5 class="card-title">Plan Events</h5>
+                  <h5 class="card-title">Payment Collection</h5>
                   <p class="card-text">You can use this to plan your cca events</p>
-                  <a href="#" class="btn btn-primary">Let's Go</a>
+                  {% if user.is_authenticated %}
+                  <a href="{% url 'payment' %}" class="btn btn-primary">Let's Go</a>
+                  {% else %}
+                  <a href="{% url 'login' %}" class="btn btn-primary">Login to Unlock</a>
+                  {% endif %}
                 </div>
               </div>
         </div>
