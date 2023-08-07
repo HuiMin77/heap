@@ -194,7 +194,7 @@ def add_payment(request):
             description = form.cleaned_data['description']
             price = form.cleaned_data['price']
             payment_event = form.cleaned_data['payment_event']
-            
+            print(type(payment_event))
             
             # payment_poll = PaymentPoll.objects.get(subject=subject)
             # password = form.cleaned_data['password']
@@ -213,13 +213,17 @@ def add_payment(request):
             submitted = True
             print(payment_poll)
             print(subject,description,price,password,payment_event,payment_poll.poll_creator)
-            students = Student.objects.all()
+            students = Attendance.objects.filter(event=payment_event)
 
             #this prevents the same student participating in the same event from being allowed to pay twice (even if there are 2 payment poll instances created)
-            for student in students:
-                if Tracking_Payment.objects.get(student=student, event=payment_event) is None:
+            for attendance_record in students:
+                student = attendance_record.student
+                
+                try:
+                    existing_payment = Tracking_Payment.objects.get(student=student, event=payment_event)
+                except Tracking_Payment.DoesNotExist:
+            # If no matching payment exists, create a new payment
                     Tracking_Payment.objects.create(student=student, event=payment_event, price=payment_poll)
-            
             # return HttpResponseRedirect('/add_payment?submitted=True')
             return render(request, 'events/add_payment.html', {'form': form, 'submitted': submitted, 'password': password})
     else:

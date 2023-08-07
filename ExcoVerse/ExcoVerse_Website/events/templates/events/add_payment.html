@@ -5,9 +5,19 @@
     <h1>Add Payment</h1>
     <br/><br/>
     {% if submitted %}
-    Your payment details Was Submitted Successfully!!!
+    Your payment poll was submitted successfully. To retrieve the poll:
+    <br>
+    1. Trigger our telegram bot <a href ='https://t.me/excoverse_bot'>ExcoVerse_ClubFeePayment</a>
+    <br>
+    2. Start the bot with /start
+    <br>
+    3. Retrieve the link to your payment poll using /create_payment_poll
+    <br>
+    3. Enter the password: {{ password }}
+    <br>
+    4. Forward the message containing the link to your payment poll and password to your club chat!!
 
-    <p>Password: {{ password }}</p>
+    <!-- <p>Password: {{ password }}</p> -->
     {% else %}
 
         <form action="" method="POST">

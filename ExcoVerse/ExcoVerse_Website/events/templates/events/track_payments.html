@@ -22,7 +22,7 @@
         {% regroup tracking_payments by event as event_payments %}
 
         {% for event_group in event_payments %}
-        <h2>Event: {{ event_group.grouper }}</h2>
+        
         <h3>No. of People Paid: {{total_paid}} </h3>
         <h3>Total No. of People Not Paid: {{total_never_pay}}</h3>
         <h3>Amount of Money Collectable {{unprocessed_payment_count}} </h3>
@@ -64,7 +64,7 @@
             </form>
             
         </div>
-        <h2>All Events</h2>
+        
         <h3>No. of People Paid: {{total_paid}} </h3>
         <h3>Total No. of People Not Paid: {{total_never_pay}}</h3>
         <h3>Amount of Money Collectable {{unprocessed_payment_count}} </h3>
