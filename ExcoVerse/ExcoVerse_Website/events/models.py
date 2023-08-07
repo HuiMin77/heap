@@ -64,6 +64,7 @@ class Attendance(models.Model):
     student = models.ForeignKey(Student, blank=True, null=True, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, blank=True, null=True, on_delete=models.CASCADE)
     present = models.BooleanField(default=False)
+    manager = models.CharField('Manager', max_length=120, blank=True)
 
     def __str__(self):
         return self.student.first_name + ' ' + self.student.last_name 

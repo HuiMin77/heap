@@ -105,7 +105,7 @@ def add_event(request):
 
 def add_attendance(request, student, event):
     if request.user.is_authenticated:
-
+        username = request.user.username
         print('student')
         print(student)
 
@@ -114,7 +114,7 @@ def add_attendance(request, student, event):
 
         # Get or create the event instance
         # Create the attendance record
-        attendance, created = Attendance.objects.get_or_create(student=student, event=event, present=False )
+        attendance, created = Attendance.objects.get_or_create(student=student, event=event, present=False,manager=username)
         attendance.save()
  
 def update(request):
@@ -410,7 +410,11 @@ def generate_frames(status):
     
     print(status)
     if status == "false":
-        cam.release()  # Release the camera when status is 'false'\
+        try:
+            print('camera is being released')
+            cam.release()
+        except Exception as e:
+            print("Error releasing camera:", e)
         cv2.destroyAllWindows()
         # print('hi1',cam.isOpened())
         return HttpResponse('hi')
@@ -442,19 +446,23 @@ def take_attendance(data):
             data = {}
             return JsonResponse(data)
         else:
-            print('gg.com')
+            print('Not Working')
 
 def get_attendance(request):
     #note random order would be order_by(?)
     if request.method == "POST":
         searched = request.POST['searched']
         if searched == '':
-            attendance_list = Attendance.objects.all()
-            return render(request,'events/attendance.html',{'attendance_list':attendance_list})
+            if request.user.is_authenticated:
+                username = request.user.username
+                attendance_list = Attendance.objects.filter(manager=username)
+                return render(request,'events/attendance.html',{'attendance_list':attendance_list})
         events = Attendance.objects.filter(event__name__contains=searched)  # Assuming 'event' is a ForeignKey to an Event model with a 'name' field
         return render(request,'events/attendance.html',{'searched':searched,'events':events})
         
-    else:
-        attendance_list = Attendance.objects.all()
+    # else:
+    if request.user.is_authenticated:
+        username = request.user.username
+        attendance_list = Attendance.objects.filter(manager=username)
         return render(request,'events/attendance.html',{'attendance_list':attendance_list})
 

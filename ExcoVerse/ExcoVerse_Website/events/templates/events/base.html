@@ -22,7 +22,32 @@
     body {
     background-color: #333; /* Set your desired dark color code */
     color: white;
+
   }
+  /* Add lines before and after the welcome-item */
+.welcome-text {
+    color: white;
+}
+.welcome-item {
+  position: relative; /* Required for positioning the pseudo-elements */
+}
+
+.welcome-item::before,
+.welcome-item::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background-color: white; /* Line color */
+}
+
+.welcome-item::before {
+  top: 0;
+}
+
+.welcome-item::after {
+  bottom: 0;
+}
 </style>
 
 <body>
@@ -35,6 +60,9 @@
           </a>
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
             {% if user.is_authenticated %}
+            <li class="nav-item welcome-item">
+              <span class="nav-link align-middle px-0 welcome-text">Welcome, {{ user.username }}</span>
+          </li>
             <li class="nav-item">
               <a href="{% url 'add-student' %}" class="nav-link align-middle px-0">
                 <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline text-white">Register Students</span>
