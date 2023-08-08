@@ -20,6 +20,14 @@
 {% if tracking_payments %}
 
     {% if selected_event %}
+    {% if messages %}
+              {% for message in messages %}
+              <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                  <strong>{{message}}</strong>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
         {% regroup tracking_payments by event as event_payments %}
 
         {% for event_group in event_payments %}
@@ -100,8 +108,16 @@
               
               <button type="submit" class="btn btn-secondary">Process Payment</button>
             </form>
+            <br>
+            <form action="{% url 'change_stripe_acct' %}" method="POST">
+                {% csrf_token %}
+                
+                <button type="submit" class="btn btn-secondary">Change Stripe Account Receiver (email: {{ acct_email }})</button>
+              </form>
             
         </div>
+
+
     {% endif %}
 {% else %}
     <p>No tracking payments found for any event.</p>

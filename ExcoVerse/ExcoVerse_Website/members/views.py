@@ -23,10 +23,11 @@ import hashlib
 
 # Load environment variables from .env file
 
-# dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'events', '.env')
-# load_dotenv(dotenv_path)
-# stripe.api_key = os.environ.get('STRIPE_API_KEY')
-stripe.api_key = 'sk_test_51NPQo0HLT8WmDutBFqvUGugxoLESvZLHVse03ccDBJhV4sCCor47wDlK128kVi0OTsK9rhYrPhH7rF7wnFNLJliS00di72Mrdz'
+import os
+from dotenv import load_dotenv
+dotenv_path = os.path.join(os.path.dirname(__file__), '.', '.env')
+load_dotenv(dotenv_path)
+stripe.api_key = os.environ.get('STRIPE_API_KEY')
 
 def login_user(request):
     # Check if the person go to the webpage or fill out the form
@@ -82,7 +83,7 @@ def register_user(request):
             return redirect(redirect_stripe_url)
     else:
         form = RegisterUserForm()
-        print(stripe.api_key)
+       
     return render(request,'authenticate/register_user.html',{'form':form,})
 
 def create_connected_account():

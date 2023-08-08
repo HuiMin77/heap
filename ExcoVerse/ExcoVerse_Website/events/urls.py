@@ -18,6 +18,8 @@ urlpatterns = [
     path('all_events/',views.all_events, name="list-events"),
     path('all_cal_events/',views.all_cal_events, name="all_cal_events"),
     path('add_calendar_event/',views.add_calendar_event, name="add_calendar_event"),
+    path('change_stripe_acct/',views.change_stripe_acct, name="change_stripe_acct"),
+    
 
 ]
 
