@@ -404,67 +404,89 @@ def add_membership(request, student_id):
 
 
    
-def generate_frames(request,status):
+should_run = {}
+   
+def generate_frames(request,status,eventId):
     print(status)
-    global stop
-    stop = False
     cam = cv2.VideoCapture()
-
+    
+    if status == 'true':
+        if eventId not in should_run:
+            should_run[eventId] = True
+        else:
+            if should_run[eventId] == True:
+                pass
+            else:
+                should_run[eventId] = True
+    else:
+        if eventId not in should_run:
+            pass
+        else:
+            if should_run[eventId] == True:
+                should_run[eventId] = False
+            else:
+                return("Camera not working.")
+    
     last_scan_time = 0
-
     scan_delay = 1  # Set the delay in seconds
     delay_passed = True
 
+    try:
+        while should_run[eventId] == True:
+            cam = cv2.VideoCapture(0)
 
-    while status == 'true' and stop == False:
-        cam = cv2.VideoCapture(0)
-
-        print(status)
-        if status=='false':
-            break
-        else:
-            ret, frame = cam.read()
-            
-            if not ret:
+            print(status)
+            if status=='false':
                 break
+            else:
+                ret, frame = cam.read()
+                
+                if not ret:
+                    break
 
-            cam.set(3, 640)
-            cam.set(4, 480)
+                cam.set(3, 640)
+                cam.set(4, 480)
 
-            current_time = time.time()
+                current_time = time.time()
 
-            if delay_passed and current_time - last_scan_time >= scan_delay:
-                for qr_code in decode(frame):
-                    data = qr_code.data.decode('utf-8')
-                    print('QR Code Data:', data)
-                    take_attendance(request,data)
-                    last_scan_time = current_time  # Update last scan time
-                    delay_passed = False  # Set the delay flag
+                if delay_passed and current_time - last_scan_time >= scan_delay:
+                    for qr_code in decode(frame):
+                        data = qr_code.data.decode('utf-8')
+                        print('QR Code Data:', data)
+                        take_attendance(request,data)
+                        last_scan_time = current_time  # Update last scan time
+                        delay_passed = False  # Set the delay flag
 
-            _, buffer = cv2.imencode('.jpg', frame)
-            image_data = buffer.tobytes()
+                _, buffer = cv2.imencode('.jpg', frame)
+                image_data = buffer.tobytes()
 
-            # Check if the delay has passed and reset the flag
-            if not delay_passed and current_time - last_scan_time >= scan_delay:
-                delay_passed = True
+                # Check if the delay has passed and reset the flag
+                if not delay_passed and current_time - last_scan_time >= scan_delay:
+                    delay_passed = True
+    except:
+        pass
 
       
     print(status)
-    if status == "false":
-        try:
-            print('Releasing camera')
-            cam.release()
-            cv2.destroyAllWindows()
-            stop = True
+    print(should_run)
+    try:
+        if should_run[eventId] == False:
+            try:
+                print('Releasing camera')
+                cam.release()
+                cv2.destroyAllWindows()
+                del should_run[eventId]
+                
+            except Exception as e:
+                print("Error releasing camera:", e)
             
-        except Exception as e:
-            print("Error releasing camera:", e)
-        
+            return HttpResponse("Camera released.")
+    except:
         return HttpResponse("Camera released.")
 
-def scan_qrcode_view(request,status):
-    print('cam status',status)
-    return StreamingHttpResponse(generate_frames(request,status), content_type='multipart/x-mixed-replace; boundary=frame')
+def scan_qrcode_view(request,status,eventId):
+    print('cam status',status,eventId)
+    return StreamingHttpResponse(generate_frames(request,status,eventId), content_type='multipart/x-mixed-replace; boundary=frame')
 
 def take_attendance(request,data):
     print(data)
