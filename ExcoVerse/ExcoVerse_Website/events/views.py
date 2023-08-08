@@ -88,7 +88,7 @@ def add_event(request):
                 add_attendance(request, student=student_instance, event=event)
 
 
-        # send_QRcode(event)
+        send_QRcode(event)
         return HttpResponseRedirect('events')
 
     else:  
