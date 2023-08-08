@@ -85,7 +85,7 @@ h1{
     <h1>Venues</h1>
     <div class="col"> 
       <a href="{% url 'add-venue' %}">
-        <button type="button" class="btn btn-primary float-end mb-5 mr-5">Add Venue</button>
+        <button type="button" class="btn btn-secondary float-end mb-5 mr-5">Add Venue</button>
       </a>
       
     </div>
@@ -100,7 +100,7 @@ h1{
           <h5 class="card-title">{{venue.name}}</h5>
           <p class="card-sub-title">{{venue.address}}, Singapore {{venue.zip_code}}</p>
           <p class="card-info">Website: {{venue.web}}</p>
-          <a href="#" class="btn btn-primary card-btn">Book Venue</a>
+          <a href="#" class="btn btn-secondary card-btn">Book Venue</a>
         </div>
       </div>
     </div>
