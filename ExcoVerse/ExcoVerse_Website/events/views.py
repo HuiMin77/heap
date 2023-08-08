@@ -6,6 +6,7 @@ from calendar import HTMLCalendar
 from datetime import datetime
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib import messages
 
 # from django.http import JsonResponse 
 from events.models import Event, Membership, PaymentDetails, PaymentPoll, Tracking_Payment, Student, CCA, Attendance
@@ -18,10 +19,12 @@ import stripe
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-
-import stripe
+from members.views import update_stripe_account_id
 import os
-stripe.api_key = os.environ.get('STRIPE_API_TOKEN')
+from dotenv import load_dotenv
+dotenv_path = os.path.join(os.path.dirname(__file__), '.', '.env')
+load_dotenv(dotenv_path)
+stripe.api_key=os.environ.get('STRIPE_API_KEY')
 
 import cv2
 from pyzbar.pyzbar import decode
@@ -219,6 +222,7 @@ def add_payment(request):
 def transfer_payment(request):
     poll_creator = request.user
     if request.method == 'POST':
+        
     
     # stripe_account_id = user_profile.stripe_account_id
     # poll_id = PaymentPoll.objects.get(poll_creator=poll_creator)
@@ -256,7 +260,9 @@ def transfer_payment(request):
             # payment_details_list = PaymentDetails.objects.filter(stripe_account_id=stripe_account_id,is_success_club=False)
             # total_amount_sum = payment_details_list.aggregate(Sum('total_amount'))['total_amount__sum']
             print("stripe acct",stripe_account_id)
-            # print(total_amount_sum)
+            
+            
+
             transfer = stripe.Transfer.create(
                 amount=int(unprocessed_payment_count)*100,  # Replace with the actual amount
                 currency='sgd',
@@ -281,6 +287,7 @@ def track_event_payment_polls(request):
     selected_event = None
     tracking_payments = None
     unprocessed_payment_count = 0
+    acct_email = ''
 
     if request.method == 'POST':
         form = EventSelectionForm(request.POST)
@@ -292,6 +299,12 @@ def track_event_payment_polls(request):
                 tracking_payments = Tracking_Payment.objects.filter(event=selected_event).order_by('is_success_excoverse')
             else:
                 tracking_payments = Tracking_Payment.objects.all().order_by('is_success_excoverse')
+                poll_creator = request.user
+                user_profile = UserProfile.objects.get(user=poll_creator)
+
+                stripe_account_id = user_profile.stripe_account_id
+                acct_email = stripe.Account.retrieve(stripe_account_id).email
+                
 
             # payment_poll = PaymentPoll.objects.get(payment_event=selected_event)
             
@@ -306,13 +319,20 @@ def track_event_payment_polls(request):
             # unprocessed_payment_count = unprocessed_payment_object.aggregate(Sum('price'))['price']
             total_paid = tracking_payments.filter(is_success_excoverse=True).count()
             total_never_pay = tracking_payments.filter(is_success_excoverse=False).count()
+
+            poll_creator = request.user
+            user_profile = UserProfile.objects.get(user=poll_creator)
+
+            stripe_account_id = user_profile.stripe_account_id
+            # payment_details_list = PaymentDetails.objects.filter(stripe_account_id=stripe_account_id,is_success_club=False)
+            # total_amount_sum = payment_details_list.aggregate(Sum('total_amount'))['total_amount__sum']
+            print("stripe acct",stripe_account_id)
+            
+        
             
     else:
         form = EventSelectionForm()
-        # tracking_payments_list = [{}]
-    
-        # tracking_payments_js.on = json.dumps(tracking_payments_list)
-
+        
         unprocessed_payment_object = Tracking_Payment.objects.filter(is_success_excoverse=True, is_success_club=False)
         print(unprocessed_payment_object)
 
@@ -323,6 +343,16 @@ def track_event_payment_polls(request):
         total_paid = Tracking_Payment.objects.filter(is_success_excoverse=True).count()
         total_never_pay = Tracking_Payment.objects.filter(is_success_excoverse=False).count()
 
+        poll_creator = request.user
+        user_profile = UserProfile.objects.get(user=poll_creator)
+
+        stripe_account_id = user_profile.stripe_account_id
+        
+        print("stripe acct",stripe_account_id)
+        
+        
+        
+
     context = {
         'form': form,
         'tracking_payments': tracking_payments,
@@ -330,18 +360,36 @@ def track_event_payment_polls(request):
         'unprocessed_payment_count':unprocessed_payment_count,
         'total_paid': total_paid,
         'total_never_pay': total_never_pay,
-        
-
-
+        'acct_email': acct_email
     }
 
     return render(request, 'events/Track_Payments.html', context)
 
-    # stripe.Transfer.create(
-    #         amount=total_amount_sum,
-    #         currency="sgd",
-    #         destination=stripe_account_id
-    # )
+def change_stripe_acct(request):
+    stripe.api_key = stripe.api_key
+    
+    if request.method == 'POST':
+        user_profile = UserProfile.objects.get(user=request.user)
+        stripe_account_id = user_profile.stripe_account_id
+        print(stripe_account_id)
+        account = stripe.Account.create(
+        type="standard",  # Use "standard" or another account type as needed
+        country="SG",  # Replace with the country code of the connected account
+        
+        )
+        account_id = account.stripe_id
+
+    account_link = stripe.AccountLink.create(
+        account=account_id,
+        refresh_url="http://127.0.0.1:8000/",
+        return_url="http://127.0.0.1:8000/track_payments",
+        type="account_onboarding",
+    )
+    
+    update_stripe_account_id(request.user,account_id)
+    messages.success(request,("Stripe account update success!"))
+    return redirect(account_link.url)
+
 
 def add_membership(request, student_id):
     if request.user.is_authenticated:
