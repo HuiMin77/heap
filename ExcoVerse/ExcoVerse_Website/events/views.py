@@ -363,24 +363,23 @@ def generate_frames(request,status):
     cam = cv2.VideoCapture()
 
     last_scan_time = 0
-    print('PES3',status)
+
     scan_delay = 1  # Set the delay in seconds
     delay_passed = True
 
-    print('PES1',status)
+
     while status == 'true' and stop == False:
         cam = cv2.VideoCapture(0)
-        print('PES2')
+
         print(status)
         if status=='false':
             break
         else:
-            print('crazy')
             ret, frame = cam.read()
             
             if not ret:
                 break
-            print('PHM1')
+
             cam.set(3, 640)
             cam.set(4, 480)
 
