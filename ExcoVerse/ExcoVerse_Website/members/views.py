@@ -63,7 +63,7 @@ def register_user(request):
             username = form.cleaned_data['username']
             print(username)
             password = form.cleaned_data['password1']
-            email = form.cleaned_data['email']
+            # email = form.cleaned_data['email']
             user = authenticate(username = username,password=password)
             login(request,user)
             stripe_account_tuple = create_connected_account()

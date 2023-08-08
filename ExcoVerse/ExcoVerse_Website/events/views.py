@@ -32,6 +32,7 @@ from django.http import StreamingHttpResponse, HttpResponse
 
 import time
 import re
+import numpy as np
 
 
 
@@ -405,43 +406,48 @@ def add_membership(request, student_id):
    
 def generate_frames(request,status):
     print(status)
-    cam = cv2.VideoCapture(0)
-
-    if not cam.isOpened():
-        print("Error: Camera not opened.")
-        return HttpResponse("Camera not opened.")
+    global stop
+    stop = False
+    cam = cv2.VideoCapture()
 
     last_scan_time = 0
+
     scan_delay = 1  # Set the delay in seconds
     delay_passed = True
 
-    while status == 'true':
-        ret, frame = cam.read()
-        
-        if not ret:
+
+    while status == 'true' and stop == False:
+        cam = cv2.VideoCapture(0)
+
+        print(status)
+        if status=='false':
             break
-        
-        cam.set(3, 640)
-        cam.set(4, 480)
+        else:
+            ret, frame = cam.read()
+            
+            if not ret:
+                break
 
-        current_time = time.time()
+            cam.set(3, 640)
+            cam.set(4, 480)
 
-        if delay_passed and current_time - last_scan_time >= scan_delay:
-            for qr_code in decode(frame):
-                data = qr_code.data.decode('utf-8')
-                print('QR Code Data:', data)
-                take_attendance(request,data)
-                last_scan_time = current_time  # Update last scan time
-                delay_passed = False  # Set the delay flag
+            current_time = time.time()
 
-        _, buffer = cv2.imencode('.jpg', frame)
-        image_data = buffer.tobytes()
+            if delay_passed and current_time - last_scan_time >= scan_delay:
+                for qr_code in decode(frame):
+                    data = qr_code.data.decode('utf-8')
+                    print('QR Code Data:', data)
+                    take_attendance(request,data)
+                    last_scan_time = current_time  # Update last scan time
+                    delay_passed = False  # Set the delay flag
 
-        # Check if the delay has passed and reset the flag
-        if not delay_passed and current_time - last_scan_time >= scan_delay:
-            delay_passed = True
+            _, buffer = cv2.imencode('.jpg', frame)
+            image_data = buffer.tobytes()
 
-        # Implement image data handling or streaming if needed
+            # Check if the delay has passed and reset the flag
+            if not delay_passed and current_time - last_scan_time >= scan_delay:
+                delay_passed = True
+
       
     print(status)
     if status == "false":
@@ -449,6 +455,8 @@ def generate_frames(request,status):
             print('Releasing camera')
             cam.release()
             cv2.destroyAllWindows()
+            stop = True
+            
         except Exception as e:
             print("Error releasing camera:", e)
         
