@@ -1,51 +1,13 @@
-<!-- {% extends 'events/base.html' %}
+{% extends 'events/base.html' %}
 
 {% block content %}
 
-<h1>Payments</h1>
+<h1>Payment has been processed successfully</h1>
 <br>
 {% if user.is_authenticated %}
-<h2>Total Amount Sum: ${{ total_amount_sum }}</h2>
 
-
-<br>
-<ul>
-    {% for payment in payment_details_list %}
-    <div class="card">
-        <div class="card-header">
-          {{payment}}
-        </div>
-        <div class="card-body">
-          <h5 class="card-title">: User_ID{{payment.user_id}}</h5>
-          <p class="card-text">
-            <ul>
-                <li>Chat ID: {{payment.chat_id}}</li>
-                
-            </ul>
-          </p>
-        </div>
-      </div>
-      
-        
-    
-    <br>
-    {% endfor %}
-    {% if total_amount_sum != 0 %}    
-    
-      <div class="card-footer text-muted">  
-        <!-- <script src="https://js.stripe.com/v3/"></script>
-        <button id="transferButton">Transfer Funds</button> -->
-        <form action="{% url 'transfer-payment' %}" method="POST">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-secondary">Process Payment</button>
-        </form>
-
-        
-        <!-- <a href="{% url 'transfer-payment' %}" class="btn btn-secondary">Process Payment</a> -->
-        
-      </div>
-    {% endif %}
   {% endif %}
+  
 
 
 </ul>

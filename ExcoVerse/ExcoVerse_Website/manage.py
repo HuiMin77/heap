@@ -9,6 +9,7 @@ import time
 
 def start_telegram_bot():
     for process in psutil.process_iter(['pid', 'name']):
+        
         if 'python' in process.info['name'] and 'bot_form.py' in ' '.join(process.cmdline()):
             print("Telegram bot is already running.")
             return
@@ -31,7 +32,7 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    # start_telegram_bot()
+    start_telegram_bot()
     execute_from_command_line(sys.argv)
 
 
