@@ -26,33 +26,6 @@ import hashlib
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'events', '.env')
 load_dotenv(dotenv_path)
 
-# models_path = os.path.join(os.path.dirname(__file__), '..', 'events', 'models.py')
-
-# # Get the module name from the path
-# module_name = '.'.join(models_path.split(os.path.sep)[:-1]).replace('/', '.')
-
-# # Import the models.py module
-# models_module = import_module(module_name)
-
-# Access the PaymentPoll model
-# PaymentPoll = models_module.PaymentPoll
-
-
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# # Set the environment variable to point to your project's settings.py
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ExcoVerse_website.settings')
-
-# import django
-
-# # Initialize Django application
-# from django.apps import apps
-
-# django.setup()
-
-# # Get the model from the events app using the app registry
-# PaymentPoll = apps.get_model('events', 'PaymentPoll')
-
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
