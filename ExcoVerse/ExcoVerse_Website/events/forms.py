@@ -91,8 +91,8 @@ class PaymentForm(ModelForm):
             
 
         }
-    payment_event = forms.ModelChoiceField(queryset=Event.objects.all(), label='Select Event')
+    payment_event = forms.ModelChoiceField(queryset=Event.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}), label='Select Event')
 
 
 class EventSelectionForm(forms.Form):
-    event = forms.ModelChoiceField(queryset=Event.objects.all(), empty_label="All Events", required=False)
+    event = forms.ModelChoiceField(queryset=Event.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}), empty_label="All Events", required=False)

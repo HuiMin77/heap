@@ -18,7 +18,7 @@
   }
 
   .card {
-    width: 320px;
+    width: 400px;
     height: 300px;
     border-radius: 20px;
     overflow: hidden;
@@ -80,6 +80,7 @@
 </style>
 
 <center>
+  <h1>Event Management</h1>
   <div class="container">
     {% for event in event_list %}
     <div class="card">
@@ -88,6 +89,22 @@
         <p class="card-subtitle"> Event Start Date: {{ event.start_event_date }}</p>
         <p class="card-subtitle"> Event End Date: {{ event.end_event_date }}</p>
         <p class="card-subtitle"> Venue: {{ event.venue }}</p>
+        <br>
+        <div class="row">
+          <div class="col">
+            <a href="{% url 'attendance' event.id %}">
+              <div class="flex btn btn-secondary">Take Attendance</div>
+            </a>
+          </div>
+          <div class="col">
+            <a href="{% url 'remove' event.id %}">
+              <div class="flex btn btn-secondary">Delete</div>
+            </a>
+          </div>
+        </div>
+      
+        
+       
       </div>
     </div>
     {% endfor %}

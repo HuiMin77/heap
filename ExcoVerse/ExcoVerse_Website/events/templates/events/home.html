@@ -48,11 +48,16 @@
   <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
       <div class="carousel-item active example">
-        <img style="width: 1000px; height: 400px; border-radius: 25px;" src="https://i.pinimg.com/originals/b2/ec/48/b2ec48ec40b3ea6ce1b0de71a45e7490.jpg" class="d-block w-100" alt="...">
+        <img style="width: 1000px; height: 350px; border-radius: 25px;" src="https://i.pinimg.com/originals/b2/ec/48/b2ec48ec40b3ea6ce1b0de71a45e7490.jpg" class="d-block w-100" alt="...">
       </div>
     </div>
   </div>
 <div class="container">
+  <br>
+  <div class="row">
+    <center><h1>Widgets</h1></center>
+    
+  </div>
     <div class="row">
         <div class="col">
             <div class="card" style="width: 18rem;">
@@ -61,9 +66,9 @@
                   <h5 class="card-title">Plan Events</h5>
                   <p class="card-text">You can use this to plan your cca events</p>
                   {% if user.is_authenticated %}
-                  <a href="{% url 'add-event' %}" class="btn btn-primary">Let's Go</a>
+                  <a href="{% url 'events' %}" class="btn btn-secondary">Let's Go</a>
                   {% else %}
-                  <a href="{% url 'login' %}" class="btn btn-primary">Login to Unlock</a>
+                  <a href="{% url 'login' %}" class="btn btn-secondary">Login to Unlock</a>
                   {% endif %}
                 </div>
               </div>
@@ -76,9 +81,9 @@
                   <p class="card-text">Taking Attendance has never been easier with this feature</p>
                   
                   {% if user.is_authenticated %}
-                  <a href="{% url 'attendance' %}" class="btn btn-primary">Let's Go</a>
+                  <a href="{% url 'list-events' %}" class="btn btn-secondary">Let's Go</a>
                   {% else %}
-                  <a href="{% url 'login' %}" class="btn btn-primary">Login to Unlock</a>
+                  <a href="{% url 'login' %}" class="btn btn-secondary">Login to Unlock</a>
                   {% endif %}
                   
                 </div>
@@ -89,11 +94,11 @@
                 <img class="card-img-top" src="https://st2.depositphotos.com/4320929/11180/v/600/depositphotos_111804622-stock-illustration-online-and-mobile-payments-concept.jpg" alt="Card image cap">
                 <div class="card-body">
                   <h5 class="card-title">Payment Collection</h5>
-                  <p class="card-text">You can use this to plan your cca events</p>
+                  <p class="card-text">Automated Payment System makes Payment Collection Easy</p>
                   {% if user.is_authenticated %}
-                  <a href="{% url 'payment' %}" class="btn btn-primary">Let's Go</a>
+                  <a href="{% url 'payment' %}" class="btn btn-secondary">Let's Go</a>
                   {% else %}
-                  <a href="{% url 'login' %}" class="btn btn-primary">Login to Unlock</a>
+                  <a href="{% url 'login' %}" class="btn btn-secondary">Login to Unlock</a>
                   {% endif %}
                 </div>
               </div>
